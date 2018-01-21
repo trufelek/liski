@@ -1,0 +1,16 @@
+html {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+}
+
+body {
+  align-items: center;
+  background: #000;
+  display: flex;
+  height: inherit;
+  justify-content: center;
+  margin: 0px;
+  width: inherit;
+}
