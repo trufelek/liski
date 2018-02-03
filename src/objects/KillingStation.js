@@ -4,7 +4,6 @@
 */
 import Prefab from 'objects/Prefab';
 import Farm from 'objects/Farm';
-import CarcassStorage from 'objects/CarcassStorage';
 import SkinningStation from 'objects/SkinningStation';
 import Stats from 'objects/Stats';
 
@@ -111,7 +110,7 @@ class KillingStation extends Prefab {
     }
 
     // stack carcass & furs in storage
-    CarcassStorage.stackCarcass();
+    Farm.carcassStorage.stackCarcass();
 
     // reset timer
     this.resetTimer();
@@ -121,7 +120,7 @@ class KillingStation extends Prefab {
   }
 
   killing() {
-    if(this.attributes.stack.current && !CarcassStorage.full) {
+    if(this.attributes.stack.current && !Farm.carcassStorage.state.full) {
       this.timer.clock.start();
     }
   }

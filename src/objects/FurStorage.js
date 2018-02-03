@@ -11,19 +11,19 @@ import Alert from 'objects/Alert';
 
 class FurStorage extends Prefab {
     constructor(game, x, y, image, frame, group) {
-        super(game, x, y, image, frame, group);
+      super(game, x, y, image, frame, group);
 
-        this.game = game;
+      this.game = game;
 
-        this.attributes = {
-	        fur: {
-	            max: 100,
-	            min: 0,
-	            current: 0,
-	            label: 'Futro',
-	            icon: 'fur_icon',
-	            increase: 2
-	        }
+      this.attributes = {
+        fur: {
+            max: 100,
+            min: 0,
+            current: 0,
+            label: 'Futro',
+            icon: 'fur_icon',
+            increase: 2
+        }
 	    };
 
 	    this.actions = {

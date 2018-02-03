@@ -4,14 +4,13 @@
 */
 import Prefab from 'objects/Prefab';
 import Farm from 'objects/Farm';
-import FurStorage from 'objects/FurStorage';
 import Stats from 'objects/Stats';
 
 class SkinningStation extends Prefab {
     constructor(game, x, y, image, frame, group) {
-        super(game, x, y, image, frame, group);
+      super(game, x, y, image, frame, group);
 
-        this.game = game;
+      this.game = game;
 
 	    this.id = SkinningStation.count;
 
@@ -86,7 +85,7 @@ class SkinningStation extends Prefab {
 	}
 
 	skinning() {
-	    if(this.attributes.stack.current && !FurStorage.state.full) {
+	    if(this.attributes.stack.current && !Farm.furStorage.state.full) {
 	        this.timer.clock.start();
 	    }
 	}
@@ -111,7 +110,7 @@ class SkinningStation extends Prefab {
 	    }
 
 	    // stack carcass & furs in storage
-	    FurStorage.stackFur();
+	    Farm.furStorage.stackFur();
 
 	    // reset timer
 	    this.resetTimer();
@@ -119,7 +118,7 @@ class SkinningStation extends Prefab {
 	    // create timer
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endSkinning);
 	}
-	
+
 }
 
 SkinningStation.all = {};

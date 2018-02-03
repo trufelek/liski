@@ -89,6 +89,10 @@ class CarcassStorage extends Prefab {
 			}
 		];
 
+		this.state = {
+				full: false
+		};
+
 		this.stats = {
 			carcass: 0,
 			recycled: 0
@@ -108,7 +112,7 @@ class CarcassStorage extends Prefab {
 		this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, false, true);
 	}
 
-	static stackCarcass() {
+	stackCarcass() {
 		// increase amount of carcass in storage
 		if(this.attributes.carcass.current + this.attributes.carcass.increase >= this.attributes.carcass.max) {
 			this.attributes.carcass.current = this.attributes.carcass.max;
@@ -228,7 +232,5 @@ class CarcassStorage extends Prefab {
 		}
 	}
 }
-
-CarcassStorage.full = false;
 
 export default CarcassStorage;
