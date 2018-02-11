@@ -19,7 +19,7 @@ class FoodStorage extends Prefab {
             food: {
                 max: 500,
                 min: 0,
-                current: 500,
+                current: 0,
                 label: 'Karma',
                 icon: 'food_icon'
             }

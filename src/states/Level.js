@@ -8,10 +8,11 @@ import Map from 'objects/Map';
 import Owner from 'objects/Owner';
 import Gui from 'objects/Gui';
 import Events from 'objects/Events';
+import Tutorial from 'objects/Tutorial';
 
 class Level extends Phaser.State {
   create() {
-    console.log('Starting first level...');
+    console.log('Starting game...');
     // init game objects
     Map.init();
     Owner.init();
@@ -47,6 +48,10 @@ class Level extends Phaser.State {
     }
   }
 
+  startTutorial() {
+    this.tutorial = new Tutorial();
+  }
+
   showLevelIntro() {
     var titleStyles = {
       font: 'bold 60px Arial',
@@ -76,6 +81,10 @@ class Level extends Phaser.State {
 
     game.time.events.add(3000, function() {
       intro.destroy();
+
+      if(this.game.tutorialEnabled) {
+        this.startTutorial();
+      }
     }, this);
   }
 
