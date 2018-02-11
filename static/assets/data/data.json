@@ -84,7 +84,10 @@
     "close": { "type": "image", "path": "assets/img/icons/close.png" },
     "upgrade_button": { "type": "image", "path": "assets/img/icons/upgrade_button.png" },
 
-    "background_music": { "type": "sound", "path": "assets/sounds/background.wav" },
+    "wiosna": { "type": "sound", "path": "assets/sounds/wiosna.wav" },
+    "lato": { "type": "sound", "path": "assets/sounds/lato.wav" },
+    "jesień": { "type": "sound", "path": "assets/sounds/jesień.wav" },
+    "zima": { "type": "sound", "path": "assets/sounds/zima.wav" },
     "food": { "type": "sound", "path": "assets/sounds/food.wav" },
     "garbage": { "type": "sound", "path": "assets/sounds/garbage.wav" },
     "add1": { "type": "sound", "path": "assets/sounds/add1.wav" },
