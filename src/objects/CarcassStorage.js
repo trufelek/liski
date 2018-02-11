@@ -225,6 +225,7 @@ class CarcassStorage extends Prefab {
 
 		// upgrade carcass storage
 		this.attributes.carcass.max = upgrade.newMax;
+		this.state.full = false;
 
 		// hide alert
 		if(this.alert) {

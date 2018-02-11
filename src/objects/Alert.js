@@ -4,11 +4,11 @@
 */
 class Alert extends Phaser.Sprite {
     constructor(game, x, y, obj) {
-        super(game, x, y);
+      super(game, x, y);
 
-        this.game = game;
+      this.game = game;
 
-        this.object = obj;
+      this.object = obj;
 	    this.warning = null;
 	    this.sound = this.game.add.audio('alert_beep');
 

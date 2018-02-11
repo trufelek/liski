@@ -3,9 +3,9 @@
  * Cage properties and methods
 */
 import Prefab from 'objects/Prefab';
+import Owner from 'objects/Owner';
 import Farm from 'objects/Farm';
 import Gui from 'objects/Gui';
-import Owner from 'objects/Owner';
 import Pavilion from 'objects/Pavilion';
 import KillingStation from 'objects/KillingStation';
 import Incubator from 'objects/Incubator';
@@ -301,6 +301,26 @@ class Cage extends Prefab {
 
         // update pavilion state
         this.pavilion.updateState();
+    }
+
+    repair(cage) {
+      // play sound
+      cage.actions.repair.sound.play();
+
+      // decrease owner cash
+      Owner.cash -= cage.actions.repair.cost;
+      Gui.showCost(cage.actions.repair.cost, cage.actions.repair.income, cage.position);
+
+      // change texture
+      cage.loadTexture('cage_double_empty', 0, false);
+
+      // hide warning
+      Gui.hideWarning(cage.warning);
+      cage.warning = null;
+
+      //update actions
+      cage.actions.add.visible = true;
+      cage.actions.repair.visible = false;
     }
 
     sick() {

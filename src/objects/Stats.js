@@ -4,11 +4,11 @@
 */
 class Stats extends Phaser.Sprite {
     constructor(game, x, y, obj, timer, attrs) {
-        super(game, x, y);
+      super(game, x, y);
 
-        this.game = game;
+      this.game = game;
 
-        this.object = obj;
+      this.object = obj;
 	    this.padding = 30;
 	    this.height = 10;
 	    this.width = 50;

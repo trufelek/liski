@@ -1,6 +1,6 @@
 /*
-* Load State
-* Load assets and render loader bar screen
+  * Load State
+  * Load assets and render loader bar screen
 */
 import Simulator from 'objects/Simulator';
 

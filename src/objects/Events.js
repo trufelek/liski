@@ -3,15 +3,14 @@
  * Random events logic
 */
 import Simulator from 'objects/Simulator';
+import Owner from 'objects/Owner';
 import Farm from 'objects/Farm';
 import Gui from 'objects/Gui';
 import Cage from 'objects/Cage';
 import Pavilion from 'objects/Pavilion';
 
 class Events {
-    constructor(game) {
-        this.game = game;
-
+    constructor() {
         this.events = [
             {name: 'intervention', penalty: 10000, icon: 'event_intervention', title: 'Interwencja Otwartych klatek!', message: 'W związku z ostatnimi wydarzeniami na fermie pojawiły się Otwarte Klatki!'},
             {name: 'epidemic', penalty: 1000, icon: 'event_disease', title: 'W pawilonie wybuchła epidemia!', message: 'Chore lisy mogą zarazić pozostałe jeśli nie zareagujesz w porę.'},
@@ -22,11 +21,8 @@ class Events {
         ];
 
         this.probability = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-
         this.event = null;
-
         this.popup = null;
-        this.sound = this.game.add.audio('event');
 
         this.message = {
             font: 'bold 16px Arial',
@@ -42,11 +38,13 @@ class Events {
             wordWrap: false,
             align: 'center'
         };
-
-        this.init();
     }
 
     init() {
+        // add audio
+        this.game = window.game;
+        this.sound = this.game.add.audio('event');
+
         // create timer loop
         this.game.time.events.loop(Phaser.Timer.SECOND * 30, this.randomEvents, this);
         this.game.time.events.loop(250, this.updateProbabilities, this);
@@ -157,7 +155,7 @@ class Events {
                 }
 
                 // penalty
-                Farm.owner.cash -= this.event.penalty;
+                Owner.cash -= this.event.penalty;
                 Gui.showPenalty(this.event.penalty);
 
                 this.sound.play();
@@ -375,4 +373,4 @@ class Events {
     }
 }
 
-export default Events;
+export default new Events();

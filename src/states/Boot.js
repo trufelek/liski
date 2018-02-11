@@ -1,6 +1,6 @@
 /*
-* Boot State
-* Loads data and sets basic configuration
+	* Boot State
+	* Loads data and sets basic configuration
 */
 import Simulator from 'objects/Simulator';
 

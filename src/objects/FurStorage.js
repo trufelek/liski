@@ -184,6 +184,7 @@ class FurStorage extends Prefab {
 
 	    // upgrade carcass storage
 	    this.attributes.fur.max = upgrade.newMax;
+      this.state.full = false;
 
 	    // hide alert
 	    if(this.alert) {

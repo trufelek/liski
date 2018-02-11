@@ -6,18 +6,22 @@ import Simulator from 'objects/Simulator';
 import Map from 'objects/Map';
 import Owner from 'objects/Owner';
 import Gui from 'objects/Gui';
+import Events from 'objects/Events';
 
 class Level1 extends Phaser.State {
   create() {
     console.log('Starting first level...');
+    // create map
     this.map = new Map(this.game);
 
     // add level music
     Simulator.music = this.game.add.audio('background_music');
     Simulator.music.loopFull(1.5);
 
+    // init game objects
     Owner.init();
     Gui.init();
+    Events.init();
   }
 
   update() {
