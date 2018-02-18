@@ -32,7 +32,7 @@ class Menu extends Phaser.State {
   }
 
   startGame() {
-    this.game.state.start("Level1");
+    this.game.state.start("Level");
   }
 }
 
