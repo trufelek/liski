@@ -13,11 +13,16 @@ import Tutorial from 'objects/Tutorial';
 class Level extends Phaser.State {
   create() {
     console.log('Starting game...');
+    this.conditions = this.game.conditions[this.game.season];
+
     // init game objects
-    Map.init();
     Owner.init();
     Gui.init();
+    Map.init();
     //Events.init();
+
+    // create game interface
+    Gui.createInterface();
 
     // add level music
     Simulator.music = this.game.add.audio('wiosna');
@@ -32,6 +37,11 @@ class Level extends Phaser.State {
 
     //update interface
     Gui.updateInterface();
+
+    //check next season condition
+    if(this.conditions) {
+      this.checkNextSeasonCondition();
+    }
   }
 
   updateCamera() {
@@ -76,7 +86,7 @@ class Level extends Phaser.State {
     var title = intro.addChild(this.game.add.text(this.game.width / 2, this.game.height / 2, this.game.season.toUpperCase(), titleStyles));
     title.anchor.setTo(0.5);
 
-    var title = intro.addChild(this.game.add.text(this.game.width / 2, this.game.height / 2 + 75, "Zabito zwierząt: " + Farm.killed, textStyles));
+    var title = intro.addChild(this.game.add.text(this.game.width / 2, this.game.height / 2 + 75, "Zabitych zwierząt: " + Farm.killed, textStyles));
     title.anchor.setTo(0.5);
 
     game.time.events.add(3000, function() {
@@ -88,13 +98,26 @@ class Level extends Phaser.State {
     }, this);
   }
 
+  checkNextSeasonCondition() {
+    // check if conditions for next level are true
+    var condition = Object.keys(this.conditions).every(function(c){ return this.conditions[c] }, this);
+
+    if(condition) {
+      this.conditions = null;
+      this.game.time.events.add(Phaser.Timer.SECOND * 2, this.switchSeasons, this);
+    }
+  }
+
   switchSeasons() {
+    // switch game seasons
     var currentSeason = this.game.seasons.indexOf(this.game.season);
     var newSeason = currentSeason == 3 ? this.game.seasons[0] : this.game.seasons[currentSeason + 1];
     this.game.season = newSeason;
 
+    this.conditions = this.game.conditions[this.game.season];
+
     Simulator.music.stop();
-    Simulator.music = this.game.add.audio(this.game.season);
+    Simulator.music = this.game.add.audio(this.game.season.replace('ń', 'n'));
     Simulator.music.loopFull(1.5);
 
     Map.switchTextures(this.game.season);

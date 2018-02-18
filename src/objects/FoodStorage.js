@@ -125,6 +125,10 @@ class FoodStorage extends Prefab {
             o.alert.hideAlert();
         }
 
+        if(o.game.season == 'wiosna' && game.year == 1) {
+          o.game.conditions[o.game.season].foodStorageFull = true;
+        }
+
         // play sound
         o.actions.buyFood.sound.play();
     }

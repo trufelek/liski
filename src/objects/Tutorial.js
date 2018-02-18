@@ -76,6 +76,7 @@ class Tutorial {
 
       // start button action
       buttonStart.events.onInputDown.add(function() {
+        this.game.tutorialEnabled = false;
         this.hidePopup();
       }, this);
 

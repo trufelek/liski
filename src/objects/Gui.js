@@ -67,7 +67,6 @@ class Gui {
     // define game & create interface
     this.game = window.game;
     this.upgradeSound = this.game.add.audio('upgrade');
-    this.createInterface();
   }
 
   createInterface() {
@@ -134,9 +133,11 @@ class Gui {
 
   showActions(obj, position, actions) {
     // if actions are visible, hide them, if not, create them
+    var actionsVisible = Object.keys(actions).filter(function(a){ return actions[a].visible });
+
     if(this.properities.state == 'actions') {
       this.destroyActions();
-    } else {
+    } else if(actionsVisible.length){
       this.properities.state = 'actions';
       this.createActions(obj, position, actions);
     }
