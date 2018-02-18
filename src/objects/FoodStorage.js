@@ -19,7 +19,7 @@ class FoodStorage extends Prefab {
             food: {
                 max: 500,
                 min: 0,
-                current: 500,
+                current: 0,
                 label: 'Karma',
                 icon: 'food_icon'
             }
@@ -123,6 +123,10 @@ class FoodStorage extends Prefab {
         // hide alert
         if(o.alert) {
             o.alert.hideAlert();
+        }
+
+        if(o.game.season == 'wiosna' && game.year == 1) {
+          o.game.conditions[o.game.season].foodStorageFull = true;
         }
 
         // play sound

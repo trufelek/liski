@@ -50,6 +50,7 @@
     "skinning_robot": { "type": "image", "path": "assets/img/skinning_robot.png" },
     "carcass": { "type": "image", "path": "assets/img/carcass.png" },
     "furs": { "type": "image", "path": "assets/img/furs.png" },
+    "drag": { "type": "image", "path": "assets/img/drag.png" },
 
     "tooltip_line": { "type": "image", "path": "assets/img/gui/line.png" },
     "action_line": { "type": "image", "path": "assets/img/gui/line2.png" },
@@ -86,7 +87,7 @@
 
     "wiosna": { "type": "sound", "path": "assets/sounds/wiosna.wav" },
     "lato": { "type": "sound", "path": "assets/sounds/lato.wav" },
-    "jesień": { "type": "sound", "path": "assets/sounds/jesień.wav" },
+    "jesien": { "type": "sound", "path": "assets/sounds/jesien.wav" },
     "zima": { "type": "sound", "path": "assets/sounds/zima.wav" },
     "food": { "type": "sound", "path": "assets/sounds/food.wav" },
     "garbage": { "type": "sound", "path": "assets/sounds/garbage.wav" },

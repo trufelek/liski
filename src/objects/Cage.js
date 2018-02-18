@@ -17,6 +17,9 @@ class Cage extends Prefab {
 
         this.game = game;
 
+        this.randomAttribute = Math.random();
+        this.randomTimer = Math.floor((Math.random() * 4) + 0);
+
         this.attributes = {
             condition: {
                 max: 100,
@@ -25,8 +28,8 @@ class Cage extends Prefab {
                 label: 'Stan zwierząt',
                 icon: 'condition_icon',
                 min_decrease: 0.5,
-                hungry_decrease: 1,
-                crowded_decrease: 3
+                hungry_decrease: 1 + this.randomAttribute,
+                crowded_decrease: 3 + this.randomAttribute
             }
         };
 
@@ -85,7 +88,7 @@ class Cage extends Prefab {
             clock: null,
             event: null,
             loops: [],
-            duration: { minutes: 0, seconds: 15 },
+            duration: { minutes: 0, seconds: 15 + this.randomTimer},
             progress: 0
         };
 
@@ -105,6 +108,10 @@ class Cage extends Prefab {
     init() {
         // add object to game
         this.game.add.existing(this);
+
+        // set object's physics
+        game.physics.arcade.enable(this);
+        this.body.setSize(60,40, 5, 5);
 
         if(this.state.enabled) {
             // create timer
@@ -139,7 +146,8 @@ class Cage extends Prefab {
     updateActions() {
         // update actions
         this.actions.kill.enabled = KillingStation.ready.length && this.state.ready;
-        this.actions.add.enabled = Incubator.incubated.length;
+        this.actions.add.enabled = Incubator.incubated.length && this.game.season == 'wiosna';
+        this.actions.add.visible = this.game.season == 'wiosna';
     }
 
     updateAttributes() {
@@ -192,40 +200,35 @@ class Cage extends Prefab {
         }
     }
 
-    addAnimals(cage) {
-        if(Incubator.incubated.length) {
-            // release incubator from incubated array
-            Incubator.dismissAnimals();
+    addAnimals() {
+          // enable cage & set timer
+          this.state.enabled = true;
 
-            // enable cage & set timer
-            cage.state.enabled = true;
+          // change texture
+          this.loadTexture('cage_double_full', 0, false);
 
-            // change texture
-            cage.loadTexture('cage_double_full', 0, false);
+          // play sound
+          var sound = this.getRandomInt(0,1);
+          this.actions.add.sounds[sound].play();
 
-            // play sound
-            var sound = cage.getRandomInt(0,1);
-            cage.actions.add.sounds[sound].play();
+          // set attributes to max
+          this.attributes.condition.current = this.attributes.condition.max;
 
-            // set attributes to max
-            cage.attributes.condition.current = cage.attributes.condition.max;
+          // update actions
+          this.actions.add.visible = false;
+          this.actions.kill.visible = true;
 
-            // update actions
-            cage.actions.add.visible = false;
-            cage.actions.kill.visible = true;
+          // add cage to all full cages
+          Cage.full.push(this);
 
-            // add cage to all full cages
-            Cage.full.push(cage);
+          // add cage to pavilion full cages
+          this.pavilion.fullCages.push(this);
 
-            // add cage to pavilion full cages
-            cage.pavilion.fullCages.push(cage);
+          // update pavilion state
+          this.pavilion.updateState();
 
-            // update pavilion state
-            cage.pavilion.updateState();
-
-            // create timer
-            cage.createTimerEvent(cage.timer.duration.minutes, cage.timer.duration.seconds, true, cage.cageReady);
-        }
+          // create timer
+          this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, true, this.cageReady);
     }
 
     emptyCage() {

@@ -14,17 +14,30 @@ class Incubator extends Prefab {
 
         this.game = game;
 
+        this.random = Math.floor((Math.random() * 4) + 0);
+
         this.actions = {
 	        incubate: {
 	            label: 'Rozmnażanie',
 	            icon: 'action_incubate_icon',
 	            position: 'top',
-	            enabled: true,
-	            visible: true,
+	            enabled: false,
+	            visible: false,
 	            callback: this.incubate,
 	            cost: 1000,
 	            income: false,
 	            sounds: [this.game.add.audio('incubate1'), this.game.add.audio('incubate2')]
+	        },
+          separate: {
+	            label: 'Separacja',
+              icon: 'action_add_icon',
+              position: 'top',
+	            enabled: false,
+	            visible: false,
+	            callback: this.seperate,
+	            cost: 1000,
+	            income: false,
+	            sounds: [this.game.add.audio('add1'), this.game.add.audio('add2')]
 	        }
 	    };
 
@@ -32,9 +45,11 @@ class Incubator extends Prefab {
 	        clock: null,
 	        event: null,
 	        loops: [],
-	        duration: { minutes: 0, seconds: 15 },
+	        duration: { minutes: 0, seconds: 5 + this.random},
 	        progress: 0
 	    };
+
+      this.incubated = false;
 
 	    this.stats = {
 	      incubated: 0
@@ -52,20 +67,94 @@ class Incubator extends Prefab {
 	    // add object to game
 	    this.game.add.existing(this);
 
+      // add drag & drop image
+      this.drag = this.game.add.sprite(this.position.x, this.position.y, 'drag', 0);
+      this.drag.alpha = 0;
+      this.drag.anchor.set(0.5);
+
+      // add drag & drop events
+      this.drag.events.onDragStart.add(this.onDragStart, this);
+      this.drag.events.onDragStop.add(this.onDragStop, this);
+      this.drag.originalPosition = this.drag.position.clone();
+
 	    // create timer
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
 
 	    // create stats
 	    this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, true, false);
+
+      // create timer loop
+      this.createTimerLoop(1000, this.updateActions, this);
+
+      this.incubate(this, false);
 	}
 
-	incubate(incubator) {
+  updateActions() {
+      // update actions
+      this.actions.incubate.visible = this.game.season == 'jesień';
+      this.actions.separate.visible = this.game.season != 'wiosna';
+  }
+
+  click() {
+    if(this.actions && !this.incubated) {
+        // show actions on click
+        Gui.showActions(this, this.position, this.actions);
+    }
+  }
+
+  onDragStart(sprite, pointer) {
+    this.drag.alpha = 1;
+  }
+
+  onDragStop(sprite) {
+    var overlapped = [];
+
+    // check every overlapping cage
+    for (var cage in Farm.cages) {
+      var overlap =  game.physics.arcade.overlap(sprite, Farm.cages[cage]);
+
+      if(overlap && !Farm.cages[cage].state.enabled) {
+            overlapped.push(Farm.cages[cage]);
+      }
+    }
+
+    if(overlapped.length) {
+      // chooce closest cage
+      var overlappedSorted = overlapped.sort(function (a, b) {
+          return a.id - b.id
+      });
+
+      // change sprite position
+      var cage = overlappedSorted[overlappedSorted.length - 1];
+      sprite.position.x = cage.position.x;
+      sprite.position.y = cage.position.y;
+      sprite.inputEnabled = true;
+      sprite.input.draggable = false;
+      sprite.alpha = 0;
+      sprite.anchor.set(0.5);
+
+      this.dismissAnimals();
+      cage.addAnimals();
+    } else {
+      // sprite is back to origin position
+      sprite.position.copyFrom(sprite.originalPosition);
+      sprite.alpha = 0;
+    }
+  }
+
+  separate(incubator) {
+    // TODO: separate from cage function
+  }
+
+	incubate(incubator, enableSound = true) {
 	    // disable incubate action
 	    incubator.actions.incubate.enabled = false;
 
 	    // play sound
-	    var sound = Math.round(Math.random());
-	    incubator.actions.incubate.sounds[sound].play();
+      if(enableSound) {
+        var sound = Math.round(Math.random());
+  	    incubator.actions.incubate.sounds[sound].play();
+      }
 
 	    // decrease owner cash
 	    Owner.cash -= incubator.actions.incubate.cost;
@@ -80,27 +169,51 @@ class Incubator extends Prefab {
 
 	endIncubation() {
 	    this.stats.incubated += this.increase;
+      this.incubated = true;
+
 	    Farm.incubated += this.increase;
 	    Incubator.incubated.push(this);
+      Incubator.ready ++;
+
+      // enable drag & drop
+      this.drag.inputEnabled = true;
+      this.drag.input.enableDrag();
+      this.game.world.bringToTop(this.drag);
+      game.physics.arcade.enable(this.drag);
+      this.drag.input.priorityID = 2;
+
+      if(Incubator.count == Incubator.ready) {
+        this.game.conditions[this.game.season].allIncubated = true;
+      }
 	}
 
-	static dismissAnimals() {
+	dismissAnimals() {
 	    // shift incubator from incubated incubators array
-	    var incubator = Incubator.incubated.shift();
+      if (Incubator.incubated.indexOf(this) > -1) {
+          Incubator.incubated.splice(Incubator.incubated.indexOf(this), 1);
+      }
+
+      this.incubated = false;
+
+      if(!Incubator.incubated.length) {
+        Incubator.ready = 0;
+        this.game.conditions[this.game.season].allInCages = true;
+      }
 
 	    // set action incubate to enabled
-	    incubator.actions.incubate.enabled = true;
-	    incubator.resetTimer();
+	    this.actions.incubate.enabled = true;
+	    this.resetTimer();
 
 	    // create timer again
-	    incubator.createTimerEvent(incubator.timer.duration.minutes, incubator.timer.duration.seconds, false, incubator.endIncubation);
+	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
 
 	    // change texture
-	    incubator.loadTexture('incubator', 0, false);
+	    this.loadTexture('incubator', 0, false);
 	}
 }
 
 Incubator.all = {};
+Incubator.ready = 0;
 Incubator.count = 0;
 Incubator.incubated = [];
 
