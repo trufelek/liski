@@ -5,16 +5,13 @@
 import Prefab from 'objects/Prefab';
 import Cage from 'objects/Cage';
 
-class Pavilion extends Prefab {
-    constructor(game, x, y, image, frame, group) {
-        super(game, x, y, image, frame, group);
-
+class Pavilion {
+    constructor(game) {
         this.game = game;
 
         Pavilion.count ++;
 
         this.pavilionId = Pavilion.count;
-        this.hidden = false;
         this.cages = [];
         this.fullCages = [];
         this.sickCages = [];
@@ -23,11 +20,6 @@ class Pavilion extends Prefab {
             clock: null,
             event: null,
             loops: []
-        };
-
-        this.color = {
-            default: '0xffffff',
-            crowded: '0xEC6A6D'
         };
 
         this.state = {
@@ -41,9 +33,6 @@ class Pavilion extends Prefab {
     }
 
     init() {
-        // add object to game
-        this.game.add.existing(this);
-
         // match pavilions and cages
         for(var cage_index in Cage.all) {
             if(Cage.all.hasOwnProperty(cage_index)) {
@@ -66,11 +55,9 @@ class Pavilion extends Prefab {
             Pavilion.crowded.push(this);
         }
 
-        // hide pavilion on start
-        this.game.time.events.add(Phaser.Timer.SECOND, this.hidePavilion, this);
-
         // create timer loop
-        this.createTimerLoop(250, this.updatePavilion, this);
+        // TODO: check if still needed
+        //this.createTimerLoop(250, this.updatePavilion, this);
     }
 
     updatePavilion() {
@@ -84,6 +71,7 @@ class Pavilion extends Prefab {
         }
     }
 
+    // TODO: delete or reuse
     updateState() {
         // update pavilion state
         if(this.fullCages.length > 8) {
@@ -101,6 +89,7 @@ class Pavilion extends Prefab {
         }
     }
 
+    // TODO: delete or reuse
     hidePavilion() {
         // hide on hover
         this.game.add.tween(this).to({alpha: 0}, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
@@ -110,6 +99,7 @@ class Pavilion extends Prefab {
         this.showCagesStats();
     }
 
+    // TODO: delete or reuse
     showCagesStats() {
         this.cages.forEach(function(e, i){
             this.game.add.tween(e.statsBar.timerBar).to( { alpha: 1 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
@@ -123,6 +113,7 @@ class Pavilion extends Prefab {
         }, this);
     }
 
+    // TODO: delete or reuse
     showPavilion() {
         this.game.add.tween(this).to({alpha: 1}, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
         this.hidden = false;
@@ -131,6 +122,7 @@ class Pavilion extends Prefab {
         this.hideCagesStats();
     }
 
+    // TODO: delete or reuse
     hideCagesStats() {
         this.cages.forEach(function(e, i){
             this.game.add.tween(e.statsBar.timerBar).to( { alpha: 0 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);

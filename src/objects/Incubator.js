@@ -9,12 +9,14 @@ import Gui from 'objects/Gui';
 import Stats from 'objects/Stats';
 
 class Incubator extends Prefab {
-    constructor(game, x, y, image, frame, group) {
+    constructor(game, x, y, image, frame, group, type) {
         super(game, x, y, image, frame, group);
 
         this.game = game;
 
         this.random = Math.floor((Math.random() * 4) + 0);
+
+        this.type = type;
 
         this.actions = {
 	        incubate: {
@@ -104,6 +106,11 @@ class Incubator extends Prefab {
 
   onDragStart(sprite, pointer) {
     this.drag.alpha = 1;
+
+    for(var c in Farm.cages) {
+      var cage = Farm.cages[c];
+      cage.loadTexture(cage.image.replace(/.$/,"b"), 0, false);
+    }
   }
 
   onDragStop(sprite) {
@@ -112,6 +119,7 @@ class Incubator extends Prefab {
     // check every overlapping cage
     for (var cage in Farm.cages) {
       var overlap =  game.physics.arcade.overlap(sprite, Farm.cages[cage]);
+      Farm.cages[cage].loadTexture(Farm.cages[cage].image.replace(/.$/,"a"), 0, false);
 
       if(overlap && !Farm.cages[cage].state.enabled) {
             overlapped.push(Farm.cages[cage]);
@@ -164,7 +172,8 @@ class Incubator extends Prefab {
 	    incubator.timer.clock.start();
 
 	    // change texture
-	    incubator.loadTexture('incubator_full', 0, false);
+      // TODO: add texture
+	    incubator.loadTexture('inkubator_' + this.type , 0, false);
 	}
 
 	endIncubation() {
@@ -208,7 +217,7 @@ class Incubator extends Prefab {
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
 
 	    // change texture
-	    this.loadTexture('incubator', 0, false);
+	    this.loadTexture('inkubator_' + this.type, 0, false);
 	}
 }
 

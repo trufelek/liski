@@ -32,9 +32,6 @@ class Level extends Phaser.State {
   }
 
   update() {
-    // update camera
-    this.updateCamera();
-
     //update interface
     Gui.updateInterface();
 
@@ -44,6 +41,7 @@ class Level extends Phaser.State {
     }
   }
 
+  //TODO: delete or reuse
   updateCamera() {
     // control camera by dragging the map
     if (this.game.input.activePointer.isDown) {
@@ -120,7 +118,8 @@ class Level extends Phaser.State {
     Simulator.music = this.game.add.audio(this.game.season.replace('ń', 'n'));
     Simulator.music.loopFull(1.5);
 
-    Map.switchTextures(this.game.season);
+    // TODO: add textures for each season
+    //Map.switchTextures(this.game.season);
 
     this.showLevelIntro();
   }
