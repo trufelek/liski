@@ -61,7 +61,7 @@ class Cage extends Prefab {
                 icon: 'action_add_icon',
                 position: 'top',
                 enabled: false,
-                visible: enabled ? false : true,
+                visible: false,
                 callback: this.addAnimals,
                 sounds: [game.add.audio('add1'), game.add.audio('add2')]
             },
@@ -111,7 +111,7 @@ class Cage extends Prefab {
 
         // set object's physics
         game.physics.arcade.enable(this);
-        this.body.setSize(60,40, 5, 5);
+        this.body.setSize(200,100, 50, 100);
 
         if(this.state.enabled) {
             // create timer
@@ -126,8 +126,6 @@ class Cage extends Prefab {
 
         // create stats
         this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, true, true);
-        this.statsBar.timerBar.alpha = 0;
-        this.statsBar.attrsBar.alpha = 0;
     }
 
     updateCage() {
@@ -146,8 +144,6 @@ class Cage extends Prefab {
     updateActions() {
         // update actions
         this.actions.kill.enabled = KillingStation.ready.length && this.state.ready;
-        this.actions.add.enabled = Incubator.incubated.length && this.game.season == 'wiosna';
-        this.actions.add.visible = this.game.season == 'wiosna';
     }
 
     updateAttributes() {
@@ -205,7 +201,8 @@ class Cage extends Prefab {
           this.state.enabled = true;
 
           // change texture
-          this.loadTexture('cage_double_full', 0, false);
+          // TODO: add texture
+          //this.loadTexture('cage_double_full', 0, false);
 
           // play sound
           var sound = this.getRandomInt(0,1);
@@ -236,7 +233,8 @@ class Cage extends Prefab {
         this.resetTimer();
 
         // change texture
-        this.loadTexture('cage_double_empty', 0, false);
+        // TODO: add texture
+        //this.loadTexture('cage_double_empty', 0, false);
 
         // reset current cage
         this.state.enabled = false;
@@ -272,7 +270,8 @@ class Cage extends Prefab {
         this.resetTimer();
 
         // change texture
-        this.loadTexture('cage_double_broken', 0, false);
+        // TODO: add texture
+        //this.loadTexture('cage_double_broken', 0, false);
 
         // show warning
         this.warning = Gui.showWarning(this.position, 'warning_broken');
@@ -315,7 +314,8 @@ class Cage extends Prefab {
       Gui.showCost(cage.actions.repair.cost, cage.actions.repair.income, cage.position);
 
       // change texture
-      cage.loadTexture('cage_double_empty', 0, false);
+      // TODO: add texture
+      //cage.loadTexture('cage_double_empty', 0, false);
 
       // hide warning
       Gui.hideWarning(cage.warning);
@@ -328,7 +328,8 @@ class Cage extends Prefab {
 
     sick() {
         // change texture
-        this.loadTexture('cage_double_sick', 0, false);
+        // TODO: add texture
+        //this.loadTexture('cage_double_sick', 0, false);
 
         // show warning
         this.warning = Gui.showWarning(this.position, 'warning_sick');
@@ -383,7 +384,8 @@ class Cage extends Prefab {
         }
 
         // change texture
-        cage.loadTexture('cage_double_full', 0, false);
+        // TODO: add texture
+        //cage.loadTexture('cage_double_full', 0, false);
 
         //update actions
         cage.actions.kill.visible = true;
@@ -423,7 +425,8 @@ class Cage extends Prefab {
         this.resetTimer();
 
         // change texture
-        this.loadTexture('cage_double_empty', 0, false);
+        // TODO: add texture
+        //this.loadTexture('cage_double_empty', 0, false);
 
         // reset current cage
         this.state.enabled = false;

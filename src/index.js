@@ -6,7 +6,7 @@ import Level from 'states/Level';
 class Game extends Phaser.Game {
 	constructor() {
 		// create phaser game
-		super(1080, 600, Phaser.CANVAS, 'game');
+		super(1920, 960, Phaser.CANVAS, 'game');
 
 		// add all states
 		this.state.add('Boot', Boot, false);

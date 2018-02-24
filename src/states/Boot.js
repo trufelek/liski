@@ -8,6 +8,10 @@ class Boot extends Phaser.State {
 	init() {
 		console.log('Booting...');
 		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.game.scale.pageAlignHorizontally = true;
+		this.game.scale.pageAlignVertically = true;
+		this.game.scale.refresh();
+		
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		this.game.input.maxPointers = 1;
 	}

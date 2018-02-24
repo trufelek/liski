@@ -16,6 +16,7 @@ class Prefab extends Phaser.Sprite {
 
         // enable input
         this.inputEnabled = true;
+        this.input.pixelPerfectOver = true;
         this.input.useHandCursor = true;
 
         // add click/touch event listeners
