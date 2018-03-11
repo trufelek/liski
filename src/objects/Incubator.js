@@ -10,38 +10,36 @@ import Stats from 'objects/Stats';
 
 class Incubator extends Prefab {
     constructor(game, x, y, image, frame, group, type) {
-        super(game, x, y, image, frame, group);
+      super(game, x, y, image, frame, group);
 
-        this.game = game;
+      this.game = game;
+      this.random = Math.floor((Math.random() * 4) + 0);
+      this.type = type;
 
-        this.random = Math.floor((Math.random() * 4) + 0);
-
-        this.type = type;
-
-        this.actions = {
-	        incubate: {
-	            label: 'Rozmnażanie',
-	            icon: 'action_incubate_icon',
-	            position: 'top',
-	            enabled: false,
-	            visible: false,
-	            callback: this.incubate,
-	            cost: 1000,
-	            income: false,
-	            sounds: [this.game.add.audio('incubate1'), this.game.add.audio('incubate2')]
-	        },
-          separate: {
-	            label: 'Separacja',
-              icon: 'action_add_icon',
-              position: 'top',
-	            enabled: false,
-	            visible: false,
-	            callback: this.seperate,
-	            cost: 1000,
-	            income: false,
-	            sounds: [this.game.add.audio('add1'), this.game.add.audio('add2')]
-	        }
-	    };
+      this.actions = {
+        incubate: {
+            label: 'Rozmnażanie',
+            icon: 'action_incubate_icon',
+            position: 'top',
+            enabled: false,
+            visible: false,
+            callback: this.incubate,
+            cost: 1000,
+            income: false,
+            sounds: [this.game.add.audio('incubate1'), this.game.add.audio('incubate2')]
+        },
+        separate: {
+            label: 'Separacja',
+            icon: 'action_add_icon',
+            position: 'top',
+            enabled: false,
+            visible: false,
+            callback: this.seperate,
+            cost: 1000,
+            income: false,
+            sounds: [this.game.add.audio('add1'), this.game.add.audio('add2')]
+        }
+      };
 
 	    this.timer = {
 	        clock: null,
@@ -52,11 +50,6 @@ class Incubator extends Prefab {
 	    };
 
       this.incubated = false;
-
-	    this.stats = {
-	      incubated: 0
-	    };
-
 	    this.increase = 25;
 
 	    Incubator.all[Incubator.count] = this;
@@ -78,6 +71,12 @@ class Incubator extends Prefab {
       this.drag.events.onDragStart.add(this.onDragStart, this);
       this.drag.events.onDragStop.add(this.onDragStop, this);
       this.drag.originalPosition = this.drag.position.clone();
+
+      this.drag.events.onInputOver.add(function(){
+        if(this.incubated) {
+          this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
+        }
+      }, this);
 
 	    // create timer
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
@@ -106,20 +105,28 @@ class Incubator extends Prefab {
 
   onDragStart(sprite, pointer) {
     this.drag.alpha = 1;
+    this.game.canvas.style.cursor = "url('../assets/img/gui/grabbing.png'), auto";
 
-    for(var c in Farm.cages) {
-      var cage = Farm.cages[c];
-      cage.loadTexture(cage.image.replace(/.$/,"b"), 0, false);
+    // show cages
+    for(var p in Farm.pavilions) {
+      var pavilion = Farm.pavilions[p];
+      pavilion.roof.visible = false;
     }
   }
 
   onDragStop(sprite) {
     var overlapped = [];
+    this.game.canvas.style.cursor = 'pointer';
+
+    // hide cages
+    for(var p in Farm.pavilions) {
+      var pavilion = Farm.pavilions[p];
+      pavilion.roof.visible = true;
+    }
 
     // check every overlapping cage
     for (var cage in Farm.cages) {
       var overlap =  game.physics.arcade.overlap(sprite, Farm.cages[cage]);
-      Farm.cages[cage].loadTexture(Farm.cages[cage].image.replace(/.$/,"a"), 0, false);
 
       if(overlap && !Farm.cages[cage].state.enabled) {
             overlapped.push(Farm.cages[cage]);
@@ -127,25 +134,24 @@ class Incubator extends Prefab {
     }
 
     if(overlapped.length) {
-      // chooce closest cage
-      var overlappedSorted = overlapped.sort(function (a, b) {
-          return a.id - b.id
-      });
+      // activate cage
+      var cage = overlapped[0];
 
       // change sprite position
-      var cage = overlappedSorted[overlappedSorted.length - 1];
       sprite.position.x = cage.position.x;
       sprite.position.y = cage.position.y;
-      sprite.inputEnabled = true;
+      sprite.inputEnabled = false;
       sprite.input.draggable = false;
       sprite.alpha = 0;
       sprite.anchor.set(0.5);
 
+      // move animals to cage
       this.dismissAnimals();
       cage.addAnimals();
     } else {
       // sprite is back to origin position
       sprite.position.copyFrom(sprite.originalPosition);
+      sprite.inputEnabled = true;
       sprite.alpha = 0;
     }
   }
@@ -177,7 +183,6 @@ class Incubator extends Prefab {
 	}
 
 	endIncubation() {
-	    this.stats.incubated += this.increase;
       this.incubated = true;
 
 	    Farm.incubated += this.increase;

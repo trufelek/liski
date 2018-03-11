@@ -41,21 +41,6 @@ class Level extends Phaser.State {
     }
   }
 
-  //TODO: delete or reuse
-  updateCamera() {
-    // control camera by dragging the map
-    if (this.game.input.activePointer.isDown) {
-      if (this.game.draggingPoint) {
-        // drag the camera by the amount the pointer has moved since last update
-        this.game.camera.x += this.game.draggingPoint.x - this.game.input.activePointer.position.x;
-      }
-      // set new drag origin to current position
-      this.game.draggingPoint = this.game.input.activePointer.position.clone();
-    } else {
-      this.game.draggingPoint = null;
-    }
-  }
-
   startTutorial() {
     this.tutorial = new Tutorial();
   }
@@ -123,6 +108,12 @@ class Level extends Phaser.State {
 
     this.showLevelIntro();
   }
+
+  // render() {
+  //   for(var cage in Farm.cages) {
+  //     game.debug.body(Farm.cages[cage]);
+  //   }
+  // }
 }
 
 export default Level;

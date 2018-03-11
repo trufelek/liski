@@ -5,16 +5,17 @@
 import Prefab from 'objects/Prefab';
 import Cage from 'objects/Cage';
 
-class Pavilion {
-    constructor(game) {
+class Pavilion extends Phaser.Sprite{
+    constructor(game, x, y, image, frame, group) {
+        super(game, x, y, image, frame, group);
         this.game = game;
 
-        Pavilion.count ++;
-
-        this.pavilionId = Pavilion.count;
         this.cages = [];
         this.fullCages = [];
         this.sickCages = [];
+
+        this.front = null;
+        this.roof = null;
 
         this.timer = {
             clock: null,
@@ -27,51 +28,18 @@ class Pavilion {
             epidemic: false
         };
 
-        this.init();
-
+        Pavilion.count ++;
         Pavilion.all.push(this);
+        this.id = Pavilion.count;
+
+        this.init();
     }
 
     init() {
-        // match pavilions and cages
-        for(var cage_index in Cage.all) {
-            if(Cage.all.hasOwnProperty(cage_index)) {
-                var cage = Cage.all[cage_index];
-
-                if(cage.pavilionId == this.pavilionId) {
-                    cage.pavilion = this;
-                    this.cages.push(cage);
-
-                    if(cage.state.enabled) {
-                        this.fullCages.push(cage);
-                    }
-                }
-            }
-        }
-
-        // set pavilion state
-        if(this.fullCages.length > 8) {
-            this.state.crowded = true;
-            Pavilion.crowded.push(this);
-        }
-
-        // create timer loop
-        // TODO: check if still needed
-        //this.createTimerLoop(250, this.updatePavilion, this);
+        // add object to game
+        this.game.add.existing(this);
     }
 
-    updatePavilion() {
-        // update pavilion visibility
-        if (this.game.input.activePointer.isDown) {
-            if(this.game.camera.x < 200) {
-                this.hidePavilion();
-            } else {
-                this.showPavilion();
-            }
-        }
-    }
-
-    // TODO: delete or reuse
     updateState() {
         // update pavilion state
         if(this.fullCages.length > 8) {
@@ -87,53 +55,6 @@ class Pavilion {
 
             this.state.crowded = false;
         }
-    }
-
-    // TODO: delete or reuse
-    hidePavilion() {
-        // hide on hover
-        this.game.add.tween(this).to({alpha: 0}, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-        this.hidden = true;
-
-        // show cages stats
-        this.showCagesStats();
-    }
-
-    // TODO: delete or reuse
-    showCagesStats() {
-        this.cages.forEach(function(e, i){
-            this.game.add.tween(e.statsBar.timerBar).to( { alpha: 1 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-            this.game.add.tween(e.statsBar.attrsBar).to( { alpha: 1 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-
-            if(e.warning) {
-                this.game.add.tween(e.warning).to( { alpha: 1 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-            }
-
-            e.input.priorityID = 1;
-        }, this);
-    }
-
-    // TODO: delete or reuse
-    showPavilion() {
-        this.game.add.tween(this).to({alpha: 1}, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
-        this.hidden = false;
-
-        // hide cages stats
-        this.hideCagesStats();
-    }
-
-    // TODO: delete or reuse
-    hideCagesStats() {
-        this.cages.forEach(function(e, i){
-            this.game.add.tween(e.statsBar.timerBar).to( { alpha: 0 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-            this.game.add.tween(e.statsBar.attrsBar).to( { alpha: 0 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-
-            if(e.warning) {
-                this.game.add.tween(e.warning).to( { alpha: 0 }, 250, Phaser.Easing.Linear.None, true, 0, 0, false);
-            }
-
-            e.input.priorityID = 0;
-        }, this);
     }
 }
 
