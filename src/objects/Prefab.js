@@ -12,24 +12,18 @@ class Prefab extends Phaser.Sprite {
     this.id = Prefab.count;
     this.position = {x: x, y: y};
     this.image = image;
-    this.highlight = {hover: '0xfff401', default: '0xffffff'};
 
     // enable input
     this.inputEnabled = true;
-    this.input.pixelPerfectOver = true;
-    this.input.pixelPerfectClick = true;
     this.input.useHandCursor = true;
 
     // add click/touch event listeners
     this.events.onInputDown.add(this.click, this);
-
-    // if desktop add hover/out listeners
-    if(game.input.activePointer.isMouse) {
-      this.events.onInputOver.add(this.inputOver, this);
-      this.events.onInputOut.add(this.inputOut, this);
-    }
+    this.events.onInputOver.add(this.inputOver, this);
+    this.events.onInputOut.add(this.inputOut, this);
 
     this.statsBar = null;
+    this.glow = null;
 
     Prefab.all[this.id] = this;
     Prefab.count ++;
@@ -45,12 +39,18 @@ class Prefab extends Phaser.Sprite {
 
   inputOver() {
     // highlight object on hover
-    this.tint = this.highlight.hover;
+    if(this.glowTexture) {
+      this.glow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0, this.groundGroup));
+      this.glow.anchor.set(0.5, 0.5);
+    }
   }
 
   inputOut() {
     // remove highlight from object
-    this.tint = this.highlight.default;
+    if(this.glow) {
+      this.glow.destroy();
+      this.glow = null;
+    }
   }
 
   click() {

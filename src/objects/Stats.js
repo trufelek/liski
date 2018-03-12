@@ -52,16 +52,16 @@ class Stats extends Phaser.Sprite {
 	drawStatsBars() {
 	    if(this.drawTimerBar) {
 	        var extra_padding = this.drawAttrsBar ? 8 : 0;
-	        var time_bar_x = this.object.position.x - this.width / 2;
-	        var time_bar_y = this.object.position.y - this.padding - extra_padding;
+	        var time_bar_x = this.object.world.x - this.width / 2;
+	        var time_bar_y = this.object.world.y - this.padding - extra_padding;
 
 	        this.timerBar = this.drawBar(time_bar_x, time_bar_y);
 	        this.timerBar.progress = this.timerBar.children[1];
 	    }
 
 	   if(this.drawAttrsBar) {
-	       var attrs_bar_x = this.object.position.x - this.width / 2;
-	       var attrs_bar_y = this.object.position.y - this.padding;
+	       var attrs_bar_x = this.object.world.x - this.width / 2;
+	       var attrs_bar_y = this.object.world.y - this.padding;
 
 	       this.attrsBar = this.drawBar(attrs_bar_x, attrs_bar_y);
 	       this.attrsBar.progress = this.attrsBar.children[1];

@@ -12,7 +12,7 @@ import Incubator from 'objects/Incubator';
 import Stats from 'objects/Stats';
 
 class Cage extends Prefab {
-    constructor(game, x, y, image, frame, group, enabled, pavilion) {
+    constructor(game, x, y, image, frame, group, enabled, pavilion, type) {
         super(game, x, y, image, frame, group);
 
         this.game = game;
@@ -108,6 +108,11 @@ class Cage extends Prefab {
         this.statsBar = null;
         this.warning = null;
 
+        this.glowTexture = 'paw_' + type + '_glow';
+
+        this.events.onInputOver.add(this.inputOver, this);
+        this.events.onInputOut.add(this.inputOut, this);
+
         Cage.all[Cage.count] = this;
         Cage.count ++;
 
@@ -121,23 +126,26 @@ class Cage extends Prefab {
         // set object's physics
         game.physics.arcade.enable(this);
         this.body.setSize(200, 100, 15, 15);
-        this.input.priorityID = 1;
+        this.input.priorityID = 9;
 
+        // add to pavilion cages
         this.pavilion.cages.push(this);
-
-        if(this.state.enabled) {
-            // create timer
-            this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, true, this.cageReady);
-
-            // add to full cages
-            Cage.full.push(this);
-        }
 
         // create timer loop
         this.createTimerLoop(1000, this.updateCage, this);
 
         // create stats
         this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, true, true);
+    }
+
+    inputOver() {
+      super.inputOver();
+      this.pavilion.roof.visible = false;
+    }
+
+    inputOut() {
+      super.inputOut();
+      this.pavilion.roof.visible = true;
     }
 
     updateCage() {

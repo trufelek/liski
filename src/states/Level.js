@@ -110,8 +110,8 @@ class Level extends Phaser.State {
   }
 
   // render() {
-  //   for(var cage in Farm.cages) {
-  //     game.debug.body(Farm.cages[cage]);
+  //   for(var i in Farm.cages) {
+  //     game.debug.body(Farm.cages[i]);
   //   }
   // }
 }

@@ -10,7 +10,6 @@ class Boot extends Phaser.State {
 		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		this.game.input.maxPointers = 1;
-		this.game.canvas.style.cursor = 'pointer';
 	}
 
 	preload() {

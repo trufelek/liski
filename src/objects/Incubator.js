@@ -49,6 +49,8 @@ class Incubator extends Prefab {
 	        progress: 0
 	    };
 
+      this.glowTexture = 'inku_glow_' + type;
+
       this.incubated = false;
 	    this.increase = 25;
 
@@ -134,8 +136,13 @@ class Incubator extends Prefab {
     }
 
     if(overlapped.length) {
+      // chooce closest cage
+      var overlappedSorted = overlapped.sort(function (a, b) {
+        return a.id - b.id
+      });
+
       // activate cage
-      var cage = overlapped[0];
+      var cage = overlappedSorted[overlappedSorted.length - 1];
 
       // change sprite position
       sprite.position.x = cage.position.x;
@@ -176,10 +183,6 @@ class Incubator extends Prefab {
 
 	    //start timer
 	    incubator.timer.clock.start();
-
-	    // change texture
-      // TODO: add texture
-	    incubator.loadTexture('inkubator_' + this.type , 0, false);
 	}
 
 	endIncubation() {
@@ -195,6 +198,9 @@ class Incubator extends Prefab {
       this.game.world.bringToTop(this.drag);
       game.physics.arcade.enable(this.drag);
       this.drag.input.priorityID = 2;
+
+      // change texture
+	    this.loadTexture('inku_full_' + this.type , 0, false);
 
       if(Incubator.count == Incubator.ready) {
         this.game.conditions[this.game.season].allIncubated = true;
@@ -222,7 +228,7 @@ class Incubator extends Prefab {
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
 
 	    // change texture
-	    this.loadTexture('inkubator_' + this.type, 0, false);
+	    this.loadTexture('inku_empty_' + this.type, 0, false);
 	}
 }
 

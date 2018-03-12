@@ -41,7 +41,7 @@ class Map {
     var tile, offset;
 
     // draw background
-    this.background = this.game.add.sprite(0, 0, 'map_background', 0, this.groundGroup);
+    this.background = this.game.add.sprite(0, 0, 'background', 0, this.groundGroup);
 
     // add cages & pavilions
     this.drawPavilions();
@@ -50,7 +50,7 @@ class Map {
     this.drawIncubators();
 
     // add food FurStorage
-    Farm.foodStorage = new FoodStorage(this.game, 980, 512, 'karma_back', 0, this.foodStorageGroup);
+    Farm.foodStorage = new FoodStorage(this.game, 910, 545, 'karma_back', 0, this.foodStorageGroup);
     Farm.foodStorage.anchor.set(0.5);
 
     // draw foreground
@@ -59,41 +59,23 @@ class Map {
   }
 
   drawIncubators() {
-    var incubator = new Incubator(this.game, 140, 380, 'inkubator_b', 0, this.incubatorGroup, 'b');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
+    var incubator1 = this.drawIncubator(140, 380, 'b')
+    var incubator2 = this.drawIncubator(240, 445, 'a')
+    var incubator3 = this.drawIncubator(420, 420, 'a')
+    var incubator4 = this.drawIncubator(540, 490, 'a')
+    var incubator5 = this.drawIncubator(140, 490, 'a')
+    var incubator6 = this.drawIncubator(340, 515, 'b')
+    var incubator7 = this.drawIncubator(465, 540, 'a')
+    var incubator8 = this.drawIncubator(340, 600, 'a')
+    var incubator9 = this.drawIncubator(625, 565, 'b')
+  }
 
-    incubator = new Incubator(this.game, 240, 445, 'inkubator_a', 0, this.incubatorGroup, 'a');
+  drawIncubator(x, y, type) {
+    var shadow = this.game.add.sprite(x, y, 'inku_cien_' + type, 0, this.groundGroup);
+    var incubator = new Incubator(this.game, x, y, 'inku_empty_' + type, 0, this.incubatorGroup, type);
     Farm.incubators.push(incubator);
     incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 420, 420, 'inkubator_a', 0, this.incubatorGroup, 'a');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 540, 490, 'inkubator_a', 0, this.incubatorGroup, 'a');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 140, 490, 'inkubator_a', 0, this.incubatorGroup, 'a');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 340, 515, 'inkubator_b', 0, this.incubatorGroup, 'b');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 465, 540, 'inkubator_a', 0, this.incubatorGroup, 'a');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 340, 625, 'inkubator_a', 0, this.incubatorGroup, 'a');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
-
-    incubator = new Incubator(this.game, 625, 565, 'inkubator_b', 0, this.incubatorGroup, 'b');
-    Farm.incubators.push(incubator);
-    incubator.anchor.set(0.5);
+    shadow.anchor.set(0.5);
   }
 
   drawPavilions() {
@@ -115,17 +97,17 @@ class Map {
     pavilion.addChild(this.game.add.sprite(0, 0, 'paw_przod_spod', 0, this.pavilionGroup));
 
     // pavilion cages
-    var cageA = new Cage(this.game, 192, 298.5, 'paw_klatki_puste', 0, this.cageGroup, 0, pavilion);
+    var cageA = new Cage(this.game, 479, 156.5, 'paw_klatki_puste', 0, this.cageGroup, 0, pavilion, 'tyl');
     pavilion.addChild(cageA);
     Farm.cages.push(cageA);
     cageA.anchor.set(0.5, 0.5);
 
-    var cageB = new Cage(this.game, 337, 228, 'paw_klatki_puste', 0, this.cageGroup, 0, pavilion);
+    var cageB = new Cage(this.game, 337, 228, 'paw_klatki_puste', 0, this.cageGroup, 0, pavilion, 'srodek');
     pavilion.addChild(cageB);
     Farm.cages.push(cageB);
     cageB.anchor.set(0.5, 0.5);
 
-    var cageC = new Cage(this.game, 479, 156.5, 'paw_klatki_puste', 0, this.cageGroup, 0, pavilion);
+    var cageC = new Cage(this.game, 192, 298.5, 'paw_klatki_puste', 0, this.cageGroup, 0, pavilion, 'przod');
     pavilion.addChild(cageC);
     Farm.cages.push(cageC);
     cageC.anchor.set(0.5, 0.5);
@@ -133,6 +115,8 @@ class Map {
     // pavilion front & top
     pavilion.front = pavilion.addChild(this.game.add.sprite(0, 0, 'paw_przod_front', 0, this.pavilionGroup));
     pavilion.roof = pavilion.addChild(this.game.add.sprite(0, 0, 'paw_dach', 0, this.pavilionGroup));
+
+    pavilion.init();
 
     Farm.pavilions.push(pavilion);
 
