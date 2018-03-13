@@ -116,6 +116,10 @@ class Map {
     pavilion.front = pavilion.addChild(this.game.add.sprite(0, 0, 'paw_przod_front', 0, this.pavilionGroup));
     pavilion.roof = pavilion.addChild(this.game.add.sprite(0, 0, 'paw_dach', 0, this.pavilionGroup));
 
+    cageA.showStats();
+    cageB.showStats();
+    cageC.showStats();
+
     pavilion.init();
 
     Farm.pavilions.push(pavilion);

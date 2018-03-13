@@ -110,9 +110,6 @@ class Cage extends Prefab {
 
         this.glowTexture = 'paw_' + type + '_glow';
 
-        this.events.onInputOver.add(this.inputOver, this);
-        this.events.onInputOut.add(this.inputOut, this);
-
         Cage.all[Cage.count] = this;
         Cage.count ++;
 
@@ -133,19 +130,33 @@ class Cage extends Prefab {
 
         // create timer loop
         this.createTimerLoop(1000, this.updateCage, this);
-
-        // create stats
-        this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, true, true);
     }
 
     inputOver() {
       super.inputOver();
-      this.pavilion.roof.visible = false;
+      this.showPavilionsRoof();
+
+      var tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+      tween.onComplete.add(function(){
+        this.pavilion.roof.visible = false;
+      }, this);
     }
 
     inputOut() {
       super.inputOut();
-      this.pavilion.roof.visible = true;
+      this.showPavilionsRoof();
+    }
+
+    showPavilionsRoof() {
+      for(var p in Farm.pavilions) {
+        Farm.pavilions[p].roof.visible = true;
+        this.game.add.tween(Farm.pavilions[p].roof).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+      }
+    }
+
+    showStats() {
+      // create stats
+      this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, false, true);
     }
 
     updateCage() {

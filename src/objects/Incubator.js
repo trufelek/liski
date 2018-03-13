@@ -64,21 +64,8 @@ class Incubator extends Prefab {
 	    // add object to game
 	    this.game.add.existing(this);
 
-      // add drag & drop image
-      this.drag = this.game.add.sprite(this.position.x, this.position.y, 'drag', 0);
-      this.drag.alpha = 0;
-      this.drag.anchor.set(0.5);
-
-      // add drag & drop events
-      this.drag.events.onDragStart.add(this.onDragStart, this);
-      this.drag.events.onDragStop.add(this.onDragStop, this);
-      this.drag.originalPosition = this.drag.position.clone();
-
-      this.drag.events.onInputOver.add(function(){
-        if(this.incubated) {
-          this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
-        }
-      }, this);
+      // add draggable
+      this.initDraggable();
 
 	    // create timer
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
@@ -92,17 +79,45 @@ class Incubator extends Prefab {
       this.incubate(this, false);
 	}
 
+  initDraggable() {
+    // add drag & drop image
+    this.drag = this.game.add.sprite(this.position.x, this.position.y, 'drag', 0);
+    this.drag.alpha = 0;
+    this.drag.anchor.set(0.5);
+
+    // add drag & drop events
+    this.drag.events.onDragStart.add(this.onDragStart, this);
+    this.drag.events.onDragStop.add(this.onDragStop, this);
+    this.drag.originalPosition = this.drag.position.clone();
+  }
+
+  enableDraggable() {
+    this.drag.inputEnabled = true;
+    this.drag.input.enableDrag();
+    this.game.world.bringToTop(this.drag);
+    game.physics.arcade.enable(this.drag);
+  }
+
+  inputOver() {
+    super.inputOver();
+
+    if(this.incubated) {
+      this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
+    }
+  }
+
+  inputOut() {
+    super.inputOut();
+
+    if(this.incubated) {
+      this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
+    }
+  }
+
   updateActions() {
       // update actions
       this.actions.incubate.visible = this.game.season == 'jesień';
       this.actions.separate.visible = this.game.season != 'wiosna';
-  }
-
-  click() {
-    if(this.actions && !this.incubated) {
-        // show actions on click
-        Gui.showActions(this, this.position, this.actions);
-    }
   }
 
   onDragStart(sprite, pointer) {
@@ -119,6 +134,7 @@ class Incubator extends Prefab {
   onDragStop(sprite) {
     var overlapped = [];
     this.game.canvas.style.cursor = 'pointer';
+    sprite.alpha = 0;
 
     // hide cages
     for(var p in Farm.pavilions) {
@@ -149,7 +165,6 @@ class Incubator extends Prefab {
       sprite.position.y = cage.position.y;
       sprite.inputEnabled = false;
       sprite.input.draggable = false;
-      sprite.alpha = 0;
       sprite.anchor.set(0.5);
 
       // move animals to cage
@@ -159,7 +174,6 @@ class Incubator extends Prefab {
       // sprite is back to origin position
       sprite.position.copyFrom(sprite.originalPosition);
       sprite.inputEnabled = true;
-      sprite.alpha = 0;
     }
   }
 
@@ -193,11 +207,7 @@ class Incubator extends Prefab {
       Incubator.ready ++;
 
       // enable drag & drop
-      this.drag.inputEnabled = true;
-      this.drag.input.enableDrag();
-      this.game.world.bringToTop(this.drag);
-      game.physics.arcade.enable(this.drag);
-      this.drag.input.priorityID = 2;
+      this.enableDraggable();
 
       // change texture
 	    this.loadTexture('inku_full_' + this.type , 0, false);

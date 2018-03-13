@@ -12,6 +12,7 @@ class Prefab extends Phaser.Sprite {
     this.id = Prefab.count;
     this.position = {x: x, y: y};
     this.image = image;
+    this.game = game;
 
     // enable input
     this.inputEnabled = true;
@@ -42,14 +43,19 @@ class Prefab extends Phaser.Sprite {
     if(this.glowTexture) {
       this.glow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0, this.groundGroup));
       this.glow.anchor.set(0.5, 0.5);
+      this.glow.alpha = 0;
+      this.game.add.tween(this.glow).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
     }
   }
 
   inputOut() {
     // remove highlight from object
     if(this.glow) {
-      this.glow.destroy();
-      this.glow = null;
+      var tween = this.game.add.tween(this.glow).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+      tween.onComplete.add(function(){
+        this.glow.destroy();
+        this.glow = null;
+      }, this);
     }
   }
 

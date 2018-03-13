@@ -25,8 +25,8 @@ class Level extends Phaser.State {
     Gui.createInterface();
 
     // add level music
-    Simulator.music = this.game.add.audio('wiosna');
-    Simulator.music.loopFull(1.5);
+    // Simulator.music = this.game.add.audio('wiosna');
+    // Simulator.music.loopFull(1.5);
 
     this.showLevelIntro();
   }
