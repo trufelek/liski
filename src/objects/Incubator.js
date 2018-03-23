@@ -49,6 +49,7 @@ class Incubator extends Prefab {
 	        progress: 0
 	    };
 
+      this.dragGlow = null;
       this.glowTexture = 'inku_glow_' + type;
 
       this.incubated = false;
@@ -88,6 +89,18 @@ class Incubator extends Prefab {
     // add drag & drop events
     this.drag.events.onDragStart.add(this.onDragStart, this);
     this.drag.events.onDragStop.add(this.onDragStop, this);
+
+    this.drag.events.onInputOver.add(function(){
+      this.dragGlow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
+      this.dragGlow.anchor.set(0.5, 0.5);
+      this.dragGlow.alpha = 1;
+    }, this);
+
+    this.drag.events.onInputOut.add(function(){
+      this.dragGlow.destroy();
+      this.dragGlow = null;
+    }, this);
+
     this.drag.originalPosition = this.drag.position.clone();
   }
 
@@ -134,7 +147,11 @@ class Incubator extends Prefab {
   onDragStop(sprite) {
     var overlapped = [];
     this.game.canvas.style.cursor = 'pointer';
-    sprite.alpha = 0;
+
+    if(this.dragGlow) {
+      this.dragGlow.destroy();
+      this.dragGlow = null;
+    }
 
     // hide cages
     for(var p in Farm.pavilions) {
@@ -161,11 +178,7 @@ class Incubator extends Prefab {
       var cage = overlappedSorted[overlappedSorted.length - 1];
 
       // change sprite position
-      sprite.position.x = cage.position.x;
-      sprite.position.y = cage.position.y;
-      sprite.inputEnabled = false;
-      sprite.input.draggable = false;
-      sprite.anchor.set(0.5);
+      sprite.destroy();
 
       // move animals to cage
       this.dismissAnimals();
@@ -173,6 +186,7 @@ class Incubator extends Prefab {
     } else {
       // sprite is back to origin position
       sprite.position.copyFrom(sprite.originalPosition);
+      sprite.alpha = 0;
       sprite.inputEnabled = true;
     }
   }

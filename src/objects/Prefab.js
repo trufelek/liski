@@ -41,21 +41,17 @@ class Prefab extends Phaser.Sprite {
   inputOver() {
     // highlight object on hover
     if(this.glowTexture) {
-      this.glow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0, this.groundGroup));
+      this.glow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
       this.glow.anchor.set(0.5, 0.5);
-      this.glow.alpha = 0;
-      this.game.add.tween(this.glow).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+      this.glow.alpha = 1;
     }
   }
 
   inputOut() {
     // remove highlight from object
     if(this.glow) {
-      var tween = this.game.add.tween(this.glow).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
-      tween.onComplete.add(function(){
-        this.glow.destroy();
-        this.glow = null;
-      }, this);
+      this.glow.destroy();
+      this.glow = null;
     }
   }
 

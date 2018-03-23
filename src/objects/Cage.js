@@ -104,6 +104,8 @@ class Cage extends Prefab {
 
         this.eatingAmount = 1;
 
+        this.tween = null;
+
         this.pavilion = pavilion;
         this.statsBar = null;
         this.warning = null;
@@ -120,7 +122,7 @@ class Cage extends Prefab {
         // add object to game
         this.game.add.existing(this);
 
-        // set object's physics
+        // set object's physics & input
         game.physics.arcade.enable(this);
         this.body.setSize(200, 100, 15, 15);
         this.input.priorityID = 9;
@@ -134,29 +136,25 @@ class Cage extends Prefab {
 
     inputOver() {
       super.inputOver();
-      this.showPavilionsRoof();
 
-      var tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
-      tween.onComplete.add(function(){
+      this.tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+      this.tween.onComplete.add(function(){
         this.pavilion.roof.visible = false;
       }, this);
     }
 
     inputOut() {
       super.inputOut();
-      this.showPavilionsRoof();
+
+      if(this.tween) this.tween.stop();
+      this.pavilion.roof.visible = true;
+      var tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+
     }
 
-    showPavilionsRoof() {
-      for(var p in Farm.pavilions) {
-        Farm.pavilions[p].roof.visible = true;
-        this.game.add.tween(Farm.pavilions[p].roof).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
-      }
-    }
-
-    showStats() {
+    showStats(x, y) {
       // create stats
-      this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, false, true);
+      this.statsBar = new Stats(this.game, x, y, this, false, true);
     }
 
     updateCage() {
@@ -179,28 +177,32 @@ class Cage extends Prefab {
 
     updateAttributes() {
         // if there is no food decrease condition faster
-        var decrease = this.attributes.condition.min_decrease;
+        for(var a in this.attributes) {
+          var attr = this.attributes[a];
+          var decrease = attr.min_decrease;
 
-        if(Farm.foodStorage.state.empty) {
-            decrease += this.attributes.condition.hungry_decrease;
-        }
+          if(Farm.foodStorage.state.empty) {
+              decrease += attr.hungry_decrease;
+          }
 
-        if(this.pavilion.state.crowded) {
-            decrease += this.attributes.condition.crowded_decrease;
-        }
+          if(this.pavilion.state.crowded) {
+              decrease += attr.crowded_decrease;
+          }
 
-        // decrease condition lvl
-        if(this.attributes.condition.current - decrease <= this.attributes.condition.min) {
-            this.attributes.condition.current = this.attributes.condition.min;
-        } else {
-            this.attributes.condition.current -= decrease;
-        }
+          // decrease condition lvl
+          if(attr.current - decrease <= attr.min) {
+              attr.current = attr.min;
+          } else {
+              attr.current -= decrease;
+          }
 
-        // if condition low add to miserable
-        if(this.attributes.condition.current == this.attributes.condition.min) {
-            if(Cage.miserable.indexOf(this) == -1) {
-                Cage.miserable.push(this);
-            }
+          // if condition low add to miserable
+          //TODO: refactor this
+          if(attr.current == attr.min) {
+              if(Cage.miserable.indexOf(this) == -1) {
+                  Cage.miserable.push(this);
+              }
+          }
         }
     }
 
@@ -240,6 +242,7 @@ class Cage extends Prefab {
 
           // set attributes to max
           this.attributes.condition.current = this.attributes.condition.max;
+          this.attributes.psyche.current = this.attributes.psyche.max;
 
           // update actions
           this.actions.add.visible = false;
@@ -270,6 +273,7 @@ class Cage extends Prefab {
 
         // set attributes to min
         this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.psyche.current = this.attributes.psyche.min;
 
         //update actions
         this.actions.add.visible = true;
@@ -310,6 +314,7 @@ class Cage extends Prefab {
 
         // set attributes to min
         this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.psyche.current = this.attributes.psyche.min;
 
         //update actions
         this.actions.repair.visible = true;
@@ -459,6 +464,7 @@ class Cage extends Prefab {
 
         // set attributes to min
         this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.psyche.current = this.attributes.psyche.min;
 
         //update actions
         this.actions.add.visible = true;

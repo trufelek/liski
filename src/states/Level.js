@@ -25,8 +25,8 @@ class Level extends Phaser.State {
     Gui.createInterface();
 
     // add level music
-    // Simulator.music = this.game.add.audio('wiosna');
-    // Simulator.music.loopFull(1.5);
+    Simulator.music = this.game.add.audio('wiosna');
+    Simulator.music.loopFull(0.3);
 
     this.showLevelIntro();
   }
@@ -109,11 +109,6 @@ class Level extends Phaser.State {
     this.showLevelIntro();
   }
 
-  // render() {
-  //   for(var i in Farm.cages) {
-  //     game.debug.body(Farm.cages[i]);
-  //   }
-  // }
 }
 
 export default Level;
