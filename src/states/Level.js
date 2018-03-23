@@ -26,7 +26,7 @@ class Level extends Phaser.State {
 
     // add level music
     Simulator.music = this.game.add.audio('wiosna');
-    Simulator.music.loopFull(1.5);
+    Simulator.music.loopFull(0.3);
 
     this.showLevelIntro();
   }
@@ -38,21 +38,6 @@ class Level extends Phaser.State {
     //check next season condition
     if(this.conditions) {
       this.checkNextSeasonCondition();
-    }
-  }
-
-  //TODO: delete or reuse
-  updateCamera() {
-    // control camera by dragging the map
-    if (this.game.input.activePointer.isDown) {
-      if (this.game.draggingPoint) {
-        // drag the camera by the amount the pointer has moved since last update
-        this.game.camera.x += this.game.draggingPoint.x - this.game.input.activePointer.position.x;
-      }
-      // set new drag origin to current position
-      this.game.draggingPoint = this.game.input.activePointer.position.clone();
-    } else {
-      this.game.draggingPoint = null;
     }
   }
 
@@ -123,6 +108,7 @@ class Level extends Phaser.State {
 
     this.showLevelIntro();
   }
+
 }
 
 export default Level;

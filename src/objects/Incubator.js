@@ -10,38 +10,36 @@ import Stats from 'objects/Stats';
 
 class Incubator extends Prefab {
     constructor(game, x, y, image, frame, group, type) {
-        super(game, x, y, image, frame, group);
+      super(game, x, y, image, frame, group);
 
-        this.game = game;
+      this.game = game;
+      this.random = Math.floor((Math.random() * 4) + 0);
+      this.type = type;
 
-        this.random = Math.floor((Math.random() * 4) + 0);
-
-        this.type = type;
-
-        this.actions = {
-	        incubate: {
-	            label: 'Rozmnażanie',
-	            icon: 'action_incubate_icon',
-	            position: 'top',
-	            enabled: false,
-	            visible: false,
-	            callback: this.incubate,
-	            cost: 1000,
-	            income: false,
-	            sounds: [this.game.add.audio('incubate1'), this.game.add.audio('incubate2')]
-	        },
-          separate: {
-	            label: 'Separacja',
-              icon: 'action_add_icon',
-              position: 'top',
-	            enabled: false,
-	            visible: false,
-	            callback: this.seperate,
-	            cost: 1000,
-	            income: false,
-	            sounds: [this.game.add.audio('add1'), this.game.add.audio('add2')]
-	        }
-	    };
+      this.actions = {
+        incubate: {
+            label: 'Rozmnażanie',
+            icon: 'action_incubate_icon',
+            position: 'top',
+            enabled: false,
+            visible: false,
+            callback: this.incubate,
+            cost: 1000,
+            income: false,
+            sounds: [this.game.add.audio('incubate1'), this.game.add.audio('incubate2')]
+        },
+        separate: {
+            label: 'Separacja',
+            icon: 'action_add_icon',
+            position: 'top',
+            enabled: false,
+            visible: false,
+            callback: this.seperate,
+            cost: 1000,
+            income: false,
+            sounds: [this.game.add.audio('add1'), this.game.add.audio('add2')]
+        }
+      };
 
 	    this.timer = {
 	        clock: null,
@@ -51,12 +49,10 @@ class Incubator extends Prefab {
 	        progress: 0
 	    };
 
+      this.dragGlow = null;
+      this.glowTexture = 'inku_glow_' + type;
+
       this.incubated = false;
-
-	    this.stats = {
-	      incubated: 0
-	    };
-
 	    this.increase = 25;
 
 	    Incubator.all[Incubator.count] = this;
@@ -69,15 +65,8 @@ class Incubator extends Prefab {
 	    // add object to game
 	    this.game.add.existing(this);
 
-      // add drag & drop image
-      this.drag = this.game.add.sprite(this.position.x, this.position.y, 'drag', 0);
-      this.drag.alpha = 0;
-      this.drag.anchor.set(0.5);
-
-      // add drag & drop events
-      this.drag.events.onDragStart.add(this.onDragStart, this);
-      this.drag.events.onDragStop.add(this.onDragStop, this);
-      this.drag.originalPosition = this.drag.position.clone();
+      // add draggable
+      this.initDraggable();
 
 	    // create timer
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
@@ -91,35 +80,88 @@ class Incubator extends Prefab {
       this.incubate(this, false);
 	}
 
+  initDraggable() {
+    // add drag & drop image
+    this.drag = this.game.add.sprite(this.position.x, this.position.y, 'drag', 0);
+    this.drag.alpha = 0;
+    this.drag.anchor.set(0.5);
+
+    // add drag & drop events
+    this.drag.events.onDragStart.add(this.onDragStart, this);
+    this.drag.events.onDragStop.add(this.onDragStop, this);
+
+    this.drag.events.onInputOver.add(function(){
+      this.dragGlow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
+      this.dragGlow.anchor.set(0.5, 0.5);
+      this.dragGlow.alpha = 1;
+    }, this);
+
+    this.drag.events.onInputOut.add(function(){
+      this.dragGlow.destroy();
+      this.dragGlow = null;
+    }, this);
+
+    this.drag.originalPosition = this.drag.position.clone();
+  }
+
+  enableDraggable() {
+    this.drag.inputEnabled = true;
+    this.drag.input.enableDrag();
+    this.game.world.bringToTop(this.drag);
+    game.physics.arcade.enable(this.drag);
+  }
+
+  inputOver() {
+    super.inputOver();
+
+    if(this.incubated) {
+      this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
+    }
+  }
+
+  inputOut() {
+    super.inputOut();
+
+    if(this.incubated) {
+      this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
+    }
+  }
+
   updateActions() {
       // update actions
       this.actions.incubate.visible = this.game.season == 'jesień';
       this.actions.separate.visible = this.game.season != 'wiosna';
   }
 
-  click() {
-    if(this.actions && !this.incubated) {
-        // show actions on click
-        Gui.showActions(this, this.position, this.actions);
-    }
-  }
-
   onDragStart(sprite, pointer) {
     this.drag.alpha = 1;
+    this.game.canvas.style.cursor = "url('../assets/img/gui/grabbing.png'), auto";
 
-    for(var c in Farm.cages) {
-      var cage = Farm.cages[c];
-      cage.loadTexture(cage.image.replace(/.$/,"b"), 0, false);
+    // show cages
+    for(var p in Farm.pavilions) {
+      var pavilion = Farm.pavilions[p];
+      pavilion.roof.visible = false;
     }
   }
 
   onDragStop(sprite) {
     var overlapped = [];
+    this.game.canvas.style.cursor = 'pointer';
+
+    if(this.dragGlow) {
+      this.dragGlow.destroy();
+      this.dragGlow = null;
+    }
+
+    // hide cages
+    for(var p in Farm.pavilions) {
+      var pavilion = Farm.pavilions[p];
+      pavilion.roof.visible = true;
+    }
 
     // check every overlapping cage
     for (var cage in Farm.cages) {
       var overlap =  game.physics.arcade.overlap(sprite, Farm.cages[cage]);
-      Farm.cages[cage].loadTexture(Farm.cages[cage].image.replace(/.$/,"a"), 0, false);
 
       if(overlap && !Farm.cages[cage].state.enabled) {
             overlapped.push(Farm.cages[cage]);
@@ -129,24 +171,23 @@ class Incubator extends Prefab {
     if(overlapped.length) {
       // chooce closest cage
       var overlappedSorted = overlapped.sort(function (a, b) {
-          return a.id - b.id
+        return a.id - b.id
       });
 
-      // change sprite position
+      // activate cage
       var cage = overlappedSorted[overlappedSorted.length - 1];
-      sprite.position.x = cage.position.x;
-      sprite.position.y = cage.position.y;
-      sprite.inputEnabled = true;
-      sprite.input.draggable = false;
-      sprite.alpha = 0;
-      sprite.anchor.set(0.5);
 
+      // change sprite position
+      sprite.destroy();
+
+      // move animals to cage
       this.dismissAnimals();
       cage.addAnimals();
     } else {
       // sprite is back to origin position
       sprite.position.copyFrom(sprite.originalPosition);
       sprite.alpha = 0;
+      sprite.inputEnabled = true;
     }
   }
 
@@ -170,14 +211,9 @@ class Incubator extends Prefab {
 
 	    //start timer
 	    incubator.timer.clock.start();
-
-	    // change texture
-      // TODO: add texture
-	    incubator.loadTexture('inkubator_' + this.type , 0, false);
 	}
 
 	endIncubation() {
-	    this.stats.incubated += this.increase;
       this.incubated = true;
 
 	    Farm.incubated += this.increase;
@@ -185,11 +221,10 @@ class Incubator extends Prefab {
       Incubator.ready ++;
 
       // enable drag & drop
-      this.drag.inputEnabled = true;
-      this.drag.input.enableDrag();
-      this.game.world.bringToTop(this.drag);
-      game.physics.arcade.enable(this.drag);
-      this.drag.input.priorityID = 2;
+      this.enableDraggable();
+
+      // change texture
+	    this.loadTexture('inku_full_' + this.type , 0, false);
 
       if(Incubator.count == Incubator.ready) {
         this.game.conditions[this.game.season].allIncubated = true;
@@ -217,7 +252,7 @@ class Incubator extends Prefab {
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
 
 	    // change texture
-	    this.loadTexture('inkubator_' + this.type, 0, false);
+	    this.loadTexture('inku_empty_' + this.type, 0, false);
 	}
 }
 

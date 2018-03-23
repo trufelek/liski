@@ -5,97 +5,100 @@
 import Gui from 'objects/Gui';
 
 class Prefab extends Phaser.Sprite {
-    constructor(game, x, y, image, frame, group) {
-        super(game, x, y, image, frame, group);
+  constructor(game, x, y, image, frame, group) {
+    super(game, x, y, image, frame, group);
 
-        // main properties
-        this.id = Prefab.count;
-        this.position = {x: x, y: y};
-        this.image = image;
-        this.highlight = {hover: '0xfff401', default: '0xffffff'};
+    // main properties
+    this.id = Prefab.count;
+    this.position = {x: x, y: y};
+    this.image = image;
+    this.game = game;
 
-        // enable input
-        this.inputEnabled = true;
-        this.input.pixelPerfectOver = true;
-        this.input.useHandCursor = true;
+    // enable input
+    this.inputEnabled = true;
+    this.input.useHandCursor = true;
 
-        // add click/touch event listeners
-        this.events.onInputDown.add(this.click, this);
+    // add click/touch event listeners
+    this.events.onInputDown.add(this.click, this);
+    this.events.onInputOver.add(this.inputOver, this);
+    this.events.onInputOut.add(this.inputOut, this);
 
-        // if desktop add hover/out listeners
-        if(game.input.activePointer.isMouse) {
-            this.events.onInputOver.add(this.inputOver, this);
-            this.events.onInputOut.add(this.inputOut, this);
-        }
+    this.statsBar = null;
+    this.glow = null;
 
-        this.statsBar = null;
+    Prefab.all[this.id] = this;
+    Prefab.count ++;
+  }
 
-        Prefab.all[this.id] = this;
-        Prefab.count ++;
+  update() {
+    if(this.timer) {
+      if(this.timer.event) {
+        this.updateTimer();
+      }
     }
+  }
 
-    update() {
-        if(this.timer) {
-            if(this.timer.event) {
-                this.updateTimer();
-            }
-        }
+  inputOver() {
+    // highlight object on hover
+    if(this.glowTexture) {
+      this.glow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
+      this.glow.anchor.set(0.5, 0.5);
+      this.glow.alpha = 1;
     }
+  }
 
-    inputOver() {
-        // highlight object on hover
-        this.tint = this.highlight.hover;
+  inputOut() {
+    // remove highlight from object
+    if(this.glow) {
+      this.glow.destroy();
+      this.glow = null;
     }
+  }
 
-    inputOut() {
-        // remove highlight from object
-        this.tint = this.highlight.default;
+  click() {
+    if(this.actions) {
+      // show actions on click
+      Gui.showActions(this, this.position, this.actions);
     }
+  }
 
-    click() {
-        if(this.actions) {
-            // show actions on click
-            Gui.showActions(this, this.position, this.actions);
-        }
+  createTimerEvent(minutes, seconds, autostart, callback) {
+    // create timer event
+    this.timer.clock = this.game.time.create();
+    this.timer.event = this.timer.clock.add(Phaser.Timer.MINUTE * minutes + Phaser.Timer.SECOND * seconds, callback, this);
+
+    if(autostart) {
+      this.timer.clock.start();
     }
+  }
 
-    createTimerEvent(minutes, seconds, autostart, callback) {
-        // create timer event
-        this.timer.clock = this.game.time.create();
-        this.timer.event = this.timer.clock.add(Phaser.Timer.MINUTE * minutes + Phaser.Timer.SECOND * seconds, callback, this);
+  createTimerLoop(interval, callback, obj) {
+    // create timer loop
+    this.timer.loops.push(this.game.time.events.loop(interval, callback, obj));
+  }
 
-        if(autostart) {
-            this.timer.clock.start();
-        }
-    }
+  updateTimer() {
+    // update timer bar progress
+    var time = {};
+    time.all = Math.round((this.timer.event.delay));
+    time.left = Math.round((this.timer.event.delay - this.timer.clock.ms));
+    time.passed = time.all - time.left;
 
-    createTimerLoop(interval, callback, obj) {
-        // create timer loop
-        this.timer.loops.push(this.game.time.events.loop(interval, callback, obj));
-    }
+    this.timer.progress = time.passed * 100 / time.all;
+    this.timer.progress = this.timer.progress > 100 ? 100 : this.timer.progress;
+  }
 
-    updateTimer() {
-        // update timer bar progress
-        var time = {};
-        time.all = Math.round((this.timer.event.delay));
-        time.left = Math.round((this.timer.event.delay - this.timer.clock.ms));
-        time.passed = time.all - time.left;
+  resetTimer() {
+    // destroy timer
+    this.timer.clock.remove(this.timer.event);
+    this.timer.clock.destroy();
 
-        this.timer.progress = time.passed * 100 / time.all;
-        this.timer.progress = this.timer.progress > 100 ? 100 : this.timer.progress;
-    }
+    this.timer.progress = 0;
+  }
 
-    resetTimer() {
-        // destroy timer
-        this.timer.clock.remove(this.timer.event);
-        this.timer.clock.destroy();
-
-        this.timer.progress = 0;
-    }
-
-    getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+  getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 }
 
 Prefab.all = [];

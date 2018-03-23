@@ -12,7 +12,7 @@ import Incubator from 'objects/Incubator';
 import Stats from 'objects/Stats';
 
 class Cage extends Prefab {
-    constructor(game, x, y, image, frame, group, enabled, pavilion) {
+    constructor(game, x, y, image, frame, group, enabled, pavilion, type) {
         super(game, x, y, image, frame, group);
 
         this.game = game;
@@ -25,11 +25,21 @@ class Cage extends Prefab {
                 max: 100,
                 min: 0,
                 current: enabled ? 100 : 0,
-                label: 'Stan zwierząt',
+                label: 'Stan fizyczny zwierząt',
                 icon: 'condition_icon',
                 min_decrease: 0.5,
-                hungry_decrease: 1 + this.randomAttribute,
-                crowded_decrease: 3 + this.randomAttribute
+                hungry_decrease: 2 + this.randomAttribute,
+                crowded_decrease: 0
+            },
+            psyche: {
+              max: 100,
+              min: 0,
+              current: enabled ? 100 : 0,
+              label: 'Stan psychiczny zwierząt',
+              icon: 'condition_icon',
+              min_decrease: 0.5,
+              hungry_decrease: 1 + this.randomAttribute,
+              crowded_decrease: 3 + this.randomAttribute
             }
         };
 
@@ -94,10 +104,13 @@ class Cage extends Prefab {
 
         this.eatingAmount = 1;
 
-        this.pavilionId = pavilion;
-        this.pavilion = null;
+        this.tween = null;
+
+        this.pavilion = pavilion;
         this.statsBar = null;
         this.warning = null;
+
+        this.glowTexture = 'paw_' + type + '_glow';
 
         Cage.all[Cage.count] = this;
         Cage.count ++;
@@ -109,23 +122,39 @@ class Cage extends Prefab {
         // add object to game
         this.game.add.existing(this);
 
-        // set object's physics
+        // set object's physics & input
         game.physics.arcade.enable(this);
-        this.body.setSize(200,100, 50, 100);
+        this.body.setSize(200, 100, 15, 15);
+        this.input.priorityID = 9;
 
-        if(this.state.enabled) {
-            // create timer
-            this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, true, this.cageReady);
-
-            // add to full cages
-            Cage.full.push(this);
-        }
+        // add to pavilion cages
+        this.pavilion.cages.push(this);
 
         // create timer loop
         this.createTimerLoop(1000, this.updateCage, this);
+    }
 
-        // create stats
-        this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, true, true);
+    inputOver() {
+      super.inputOver();
+
+      this.tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+      this.tween.onComplete.add(function(){
+        this.pavilion.roof.visible = false;
+      }, this);
+    }
+
+    inputOut() {
+      super.inputOut();
+
+      if(this.tween) this.tween.stop();
+      this.pavilion.roof.visible = true;
+      var tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+    }
+
+    showStats(x, y) {
+      // create stats
+      this.statsBar = new Stats(this.game, x, y, this, false, true);
     }
 
     updateCage() {
@@ -148,28 +177,32 @@ class Cage extends Prefab {
 
     updateAttributes() {
         // if there is no food decrease condition faster
-        var decrease = this.attributes.condition.min_decrease;
+        for(var a in this.attributes) {
+          var attr = this.attributes[a];
+          var decrease = attr.min_decrease;
 
-        if(Farm.foodStorage.state.empty) {
-            decrease += this.attributes.condition.hungry_decrease;
-        }
+          if(Farm.foodStorage.state.empty) {
+              decrease += attr.hungry_decrease;
+          }
 
-        if(this.pavilion.state.crowded) {
-            decrease += this.attributes.condition.crowded_decrease;
-        }
+          if(this.pavilion.state.crowded) {
+              decrease += attr.crowded_decrease;
+          }
 
-        // decrease condition lvl
-        if(this.attributes.condition.current - decrease <= this.attributes.condition.min) {
-            this.attributes.condition.current = this.attributes.condition.min;
-        } else {
-            this.attributes.condition.current -= decrease;
-        }
+          // decrease condition lvl
+          if(attr.current - decrease <= attr.min) {
+              attr.current = attr.min;
+          } else {
+              attr.current -= decrease;
+          }
 
-        // if condition low add to miserable
-        if(this.attributes.condition.current == this.attributes.condition.min) {
-            if(Cage.miserable.indexOf(this) == -1) {
-                Cage.miserable.push(this);
-            }
+          // if condition low add to miserable
+          //TODO: refactor this
+          if(attr.current == attr.min) {
+              if(Cage.miserable.indexOf(this) == -1) {
+                  Cage.miserable.push(this);
+              }
+          }
         }
     }
 
@@ -201,8 +234,7 @@ class Cage extends Prefab {
           this.state.enabled = true;
 
           // change texture
-          // TODO: add texture
-          //this.loadTexture('cage_double_full', 0, false);
+          this.loadTexture('paw_klatki_pelne', 0, false);
 
           // play sound
           var sound = this.getRandomInt(0,1);
@@ -210,6 +242,7 @@ class Cage extends Prefab {
 
           // set attributes to max
           this.attributes.condition.current = this.attributes.condition.max;
+          this.attributes.psyche.current = this.attributes.psyche.max;
 
           // update actions
           this.actions.add.visible = false;
@@ -233,14 +266,14 @@ class Cage extends Prefab {
         this.resetTimer();
 
         // change texture
-        // TODO: add texture
-        //this.loadTexture('cage_double_empty', 0, false);
+        this.loadTexture('paw_klatki_puste', 0, false);
 
         // reset current cage
         this.state.enabled = false;
 
         // set attributes to min
         this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.psyche.current = this.attributes.psyche.min;
 
         //update actions
         this.actions.add.visible = true;
@@ -281,6 +314,7 @@ class Cage extends Prefab {
 
         // set attributes to min
         this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.psyche.current = this.attributes.psyche.min;
 
         //update actions
         this.actions.repair.visible = true;
@@ -314,8 +348,7 @@ class Cage extends Prefab {
       Gui.showCost(cage.actions.repair.cost, cage.actions.repair.income, cage.position);
 
       // change texture
-      // TODO: add texture
-      //cage.loadTexture('cage_double_empty', 0, false);
+      cage.loadTexture('paw_klatki_puste', 0, false);
 
       // hide warning
       Gui.hideWarning(cage.warning);
@@ -384,8 +417,7 @@ class Cage extends Prefab {
         }
 
         // change texture
-        // TODO: add texture
-        //cage.loadTexture('cage_double_full', 0, false);
+        cage.loadTexture('paw_klatki_pelne', 0, false);
 
         //update actions
         cage.actions.kill.visible = true;
@@ -425,14 +457,14 @@ class Cage extends Prefab {
         this.resetTimer();
 
         // change texture
-        // TODO: add texture
-        //this.loadTexture('cage_double_empty', 0, false);
+        this.loadTexture('paw_klatki_puste', 0, false);
 
         // reset current cage
         this.state.enabled = false;
 
         // set attributes to min
         this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.psyche.current = this.attributes.psyche.min;
 
         //update actions
         this.actions.add.visible = true;
