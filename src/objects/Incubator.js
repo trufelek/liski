@@ -91,6 +91,7 @@ class Incubator extends Prefab {
     this.drag.events.onDragStop.add(this.onDragStop, this);
 
     this.drag.events.onInputOver.add(function(){
+      this.game.canvas.style.cursor = "url('/assets/img/gui/grab.png'), auto";
       this.dragGlow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
       this.dragGlow.anchor.set(0.5, 0.5);
       this.dragGlow.alpha = 1;
@@ -115,16 +116,13 @@ class Incubator extends Prefab {
     super.inputOver();
 
     if(this.incubated) {
-      this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
+      this.game.canvas.style.cursor = "url('/assets/img/gui/grab.png'), auto";
     }
   }
 
   inputOut() {
     super.inputOut();
-
-    if(this.incubated) {
-      this.game.canvas.style.cursor = "url('../assets/img/gui/grab.png'), auto";
-    }
+    this.game.canvas.style.cursor = 'default';
   }
 
   updateActions() {
@@ -135,7 +133,7 @@ class Incubator extends Prefab {
 
   onDragStart(sprite, pointer) {
     this.drag.alpha = 1;
-    this.game.canvas.style.cursor = "url('../assets/img/gui/grabbing.png'), auto";
+    this.game.canvas.style.cursor = "url('/assets/img/gui/grabbing.png'), auto";
 
     // show cages
     for(var p in Farm.pavilions) {
@@ -146,7 +144,7 @@ class Incubator extends Prefab {
 
   onDragStop(sprite) {
     var overlapped = [];
-    this.game.canvas.style.cursor = 'pointer';
+    this.game.canvas.style.cursor = 'default';
 
     if(this.dragGlow) {
       this.dragGlow.destroy();

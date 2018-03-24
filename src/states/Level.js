@@ -26,7 +26,7 @@ class Level extends Phaser.State {
 
     // add level music
     Simulator.music = this.game.add.audio('wiosna');
-    Simulator.music.loopFull(0.3);
+    Simulator.music.loopFull(0);
 
     this.showLevelIntro();
   }
@@ -101,7 +101,7 @@ class Level extends Phaser.State {
 
     Simulator.music.stop();
     Simulator.music = this.game.add.audio(this.game.season.replace('ń', 'n'));
-    Simulator.music.loopFull(1.5);
+    Simulator.music.loopFull(0);
 
     // TODO: add textures for each season
     //Map.switchTextures(this.game.season);
