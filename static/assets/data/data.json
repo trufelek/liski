@@ -47,7 +47,8 @@
     "music_on": { "type": "image", "path": "assets/img/gui/music_on.png" },
     "music_off": { "type": "image", "path": "assets/img/gui/music_off.png" },
     "warning_sick": { "type": "image", "path": "assets/img/gui/warning_sick.png" },
-    "warning_broken": { "type": "image", "path": "assets/img/gui/warning_broken.png" },
+    "grab": { "type": "image", "path": "assets/img/gui/grab.png" },
+    "grabbing": { "type": "image", "path": "assets/img/gui/grabbing.png" },
 
     "action_kill_icon": { "type": "image", "path": "assets/img/icons/action_kill_icon.png" },
     "action_heal_icon": { "type": "image", "path": "assets/img/icons/action_heal_icon.png" },
