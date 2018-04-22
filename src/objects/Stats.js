@@ -21,22 +21,20 @@ class Stats extends Phaser.Sprite {
 	    this.timerBar = null;
 	    this.attrsBars = [];
 
-	    this.progress = {
-	        tint: {
-	            full: '0xccff65',
-              much: '0xcdffff',
-	            medium: '0xccccff',
-	            little: '0xffcc66',
-	            none: '0xfe6565',
-	            timer: '0xff8080'
-	        }
-	    };
-
 	    this.timer = {
 	        clock: null,
 	        event: null,
 	        loops: []
 	    };
+
+      this.tints = {
+        timer: '0xff8080',
+        health: '0xccff65',
+        psyche: '0xccccff',
+        cleanness: '0xcdffff',
+        deaths: '0xfe6565',
+        food: '0xffcc66'
+      };
 
 	    this.init();
     }
@@ -55,23 +53,26 @@ class Stats extends Phaser.Sprite {
 	drawStatsBars() {
      var offsetTop = 0;
 	    if(this.drawTimerBar) {
-	        this.timerBar = this.drawBar(offsetTop);
+	        this.timerBar = this.drawBar(offsetTop, 'timer');
 	        this.timerBar.progress = this.timerBar.children[1];
 	    }
 
 	   if(this.drawAttrsBar) {
        for(var b in this.object.attributes) {
-         this.attrsBars[b] = this.drawBar(offsetTop);
-         offsetTop += this.height;
+           this.attrsBars[b] = this.drawBar(offsetTop, b);
+           offsetTop += this.height;
        }
 	   }
 	}
 
-	drawBar(offsetTop) {
-	    var bar = this.game.add.sprite(this.positionX - this.width / 2, this.positionY - this.padding - offsetTop);
+	drawBar(offsetTop, attr) {
+      var x = this.positionX - this.width / 2;
+      var y = this.positionY - this.padding - offsetTop;
+	    var bar = this.game.add.sprite(x, y);
 	    bar.back = bar.addChild(this.game.add.sprite(0, 0, 'bar_back'));
 	    bar.progress = bar.addChild(this.game.add.sprite(0, 0, 'progress_bar'));
-	    bar.front = bar.addChild(this.game.add.sprite(0, 0, 'bar'));
+      bar.progress.tint = this.tints[attr];
+	    bar.front = bar.addChild(this.game.add.sprite(0, 0, attr == 'timer' ? 'timer_bar' :'bar'));
 
       this.game.world.bringToTop(bar);
 
@@ -80,42 +81,59 @@ class Stats extends Phaser.Sprite {
 
 	updateStats() {
 	    if(this.drawTimerBar) {
-	        // update bar progress
-	        this.timerBar.progress.tint = this.progress.tint.timer;
+	        // update time bar progress
+	        this.timerBar.progress.tint = this.tints.timer;
 	        this.timerBar.progress.width = this.width * this.object.timer.progress / 100;
 	    }
 
 	    if(this.drawAttrsBar) {
         for(var a in this.attrsBars) {
-	        // attrs bar progress
+	        // attrs bar progress & current level
 	        var attr = this.object.attributes[a];
 	        var lvl = attr.current * 100 / attr.max;
 
+          // show/hide attrs
+          this.attrsBars[a].alpha = attr.visible ? 1 : 0;
 
 	        // update bar progress
-	        this.attrsBars[a].progress.tint = this.calculateTint(lvl);
-	        this.attrsBars[a].progress.width = this.width * lvl / 100;
+	        this.attrsBars[a].progress.width = this.calculateBarWidth(lvl);
+          attr.level = this.calculateAttributeLevel(lvl);
         }
 	    }
 	}
 
-	calculateTint(percentage) {
+	calculateBarWidth(percentage) {
 	    // calculates tint of a progress bar
-	    var tint;
+      var width = 0;
 
-	    if(percentage >= 80) {
-	        tint = this.progress.tint.full;
-	    } else if(percentage < 80 && percentage >= 60) {
-	        tint = this.progress.tint.much;
-      } else if(percentage < 60 && percentage >= 40) {
-         tint = this.progress.tint.medium;
-	    } else if(percentage < 40 && percentage >= 20) {
-	        tint = this.progress.tint.little;
-	    } else if (percentage < 20) {
-	        tint = this.progress.tint.none;
-	    }
+	    if(percentage >= 66.6) {
+        width = this.width * 100 / 100;
+      } else if(percentage >= 33.3) {
+        width = this.width * 66.6 / 100;
+      } else if(percentage > 0) {
+        width = this.width * 33.3 / 100;
+      } else {
+        width = 0;
+      }
 
-	    return tint;
+      return width;
+	}
+
+  calculateAttributeLevel(percentage) {
+	    // calculates tint of a progress bar
+      var level = 0;
+
+	    if(percentage >= 66.6) {
+        level = 3;
+      } else if(percentage >= 33.3) {
+        level = 2;
+      } else if(percentage > 0) {
+        level = 1;
+      } else {
+        level = 0;
+      }
+
+      return level;
 	}
 }
 

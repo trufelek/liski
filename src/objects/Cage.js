@@ -17,29 +17,55 @@ class Cage extends Prefab {
 
         this.game = game;
 
-        this.randomAttribute = Math.random();
-        this.randomTimer = Math.floor((Math.random() * 4) + 0);
+        this.randomHealthFactor = Math.floor(Math.random() * (10 - 1 + 1)) + 1;
+        this.randomPsycheFactor = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
+        this.randomDeathsFactor = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
+        this.randomCleannesFactor = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
 
         this.attributes = {
-            condition: {
+            health: {
                 max: 100,
                 min: 0,
-                current: enabled ? 100 : 0,
-                label: 'Stan fizyczny zwierząt',
-                icon: 'condition_icon',
-                min_decrease: 0.5,
-                hungry_decrease: 2 + this.randomAttribute,
-                crowded_decrease: 0
+                current: 0,
+                label: 'Stan fizyczny',
+                decrease: this.randomHealthFactor,
+                hungry_decrease: 3,
+                crowded_decrease: 1,
+                level: 0,
+                visible: true
             },
             psyche: {
               max: 100,
               min: 0,
-              current: enabled ? 100 : 0,
-              label: 'Stan psychiczny zwierząt',
-              icon: 'condition_icon',
-              min_decrease: 0.5,
-              hungry_decrease: 1 + this.randomAttribute,
-              crowded_decrease: 3 + this.randomAttribute
+              current: 0,
+              label: 'Stan psychiczny',
+              decrease: this.randomPsycheFactor,
+              hungry_decrease: 1,
+              crowded_decrease: 3,
+              level: 0,
+              visible: true
+            },
+            cleanness: {
+              max: 100,
+              min: 0,
+              current: 0,
+              label: 'Czystość klatki',
+              increase: this.randomCleannesFactor,
+              hungry_increase: 0,
+              crowded_increase: 1,
+              level: 0,
+              visible: false
+            },
+            deaths: {
+              max: 100,
+              min: 0,
+              current: 0,
+              label: 'Liczba trucheł',
+              increase: this.randomDeathsFactor,
+              hungry_increase: 1,
+              crowded_increase: 1,
+              level: 0,
+              visible: false
             }
         };
 
@@ -49,7 +75,7 @@ class Cage extends Prefab {
                 icon: 'action_kill_icon',
                 position: 'top',
                 enabled: false,
-                visible: enabled,
+                visible: false,
                 callback: this.kill,
                 sounds: [game.add.audio('kill1'),  game.add.audio('kill2'), game.add.audio('kill3')],
                 cost: 500,
@@ -97,12 +123,12 @@ class Cage extends Prefab {
         this.timer = {
             clock: null,
             event: null,
-            loops: [],
-            duration: { minutes: 0, seconds: 15 + this.randomTimer},
-            progress: 0
+            loops: []
         };
 
-        this.eatingAmount = 1;
+        this.illness = false;
+
+        this.eatingAmount = 5;
 
         this.tween = null;
 
@@ -131,7 +157,7 @@ class Cage extends Prefab {
         this.pavilion.cages.push(this);
 
         // create timer loop
-        this.createTimerLoop(1000, this.updateCage, this);
+        this.createTimerLoop(5000, this.updateCage, this);
     }
 
     inputOver() {
@@ -158,50 +184,58 @@ class Cage extends Prefab {
     }
 
     updateCage() {
-        // enable/disable actions
-        this.updateActions();
-
         if(this.state.enabled) {
             // eat food
             this.eatingFood();
 
             // update attributes
             this.updateAttributes();
+
+            //update condition
+            this.updateCageCondition();
         }
     }
 
-    updateActions() {
-        // update actions
-        this.actions.kill.enabled = KillingStation.ready.length && this.state.ready;
-    }
-
     updateAttributes() {
-        // if there is no food decrease condition faster
         for(var a in this.attributes) {
           var attr = this.attributes[a];
-          var decrease = attr.min_decrease;
 
-          if(Farm.foodStorage.state.empty) {
-              decrease += attr.hungry_decrease;
+          // decrease attributes
+          if(attr.hasOwnProperty('decrease')) {
+            var decrease = attr.decrease;
+
+            if(attr.hasOwnProperty('hungry_decrease') && Farm.foodStorage.state.empty) {
+                decrease += attr.hungry_decrease;
+            }
+
+            if(attr.hasOwnProperty('crowded_decrease') && this.pavilion.state.crowded) {
+                decrease += attr.crowded_decrease;
+            }
+
+            if(attr.current - decrease <= attr.min) {
+                attr.current = attr.min;
+            } else {
+                attr.current -= decrease;
+            }
           }
 
-          if(this.pavilion.state.crowded) {
-              decrease += attr.crowded_decrease;
-          }
+          // increase attributes
+          if(attr.hasOwnProperty('increase')) {
+            var increase = attr.increase;
 
-          // decrease condition lvl
-          if(attr.current - decrease <= attr.min) {
-              attr.current = attr.min;
-          } else {
-              attr.current -= decrease;
-          }
+            if(attr.hasOwnProperty('hungry_increase') && Farm.foodStorage.state.empty) {
+                increase += attr.hungry_increase;
+            }
 
-          // if condition low add to miserable
-          //TODO: refactor this
-          if(attr.current == attr.min) {
-              if(Cage.miserable.indexOf(this) == -1) {
-                  Cage.miserable.push(this);
-              }
+            if(attr.hasOwnProperty('crowded_increase') && this.pavilion.state.crowded) {
+                increase += attr.crowded_increase;
+            }
+
+            if(attr.current + increase >= attr.max) {
+                attr.current = attr.max;
+            } else {
+                attr.current += increase;
+            }
           }
         }
     }
@@ -211,6 +245,65 @@ class Cage extends Prefab {
         if(!Farm.foodStorage.state.empty) {
             Farm.foodStorage.consumeFood(this.eatingAmount);
         }
+    }
+
+    updateCageCondition () {
+      var healthDiseases = ['nosówka', 'choroby jamy ustnej', 'choroby oczu',];
+      var mentalDiseases = ['nosówka', 'agresja/ autoagresja', 'apatia / zachowania stereotypowe'];
+      var healthTints = ['0xccff65', '0xff8080', '0xfe6565'];
+      var mentalTints = ['0xccccff', '0xffff00', '0xffcc66'];
+
+      var contagious = 0;
+
+      var health = this.attributes.health.level;
+      var psyche = this.attributes.psyche.level;
+
+
+      if(health < 3 || psyche < 3) {
+        //console.log('zdrowie:', health, 'psychika:', psyche);
+
+        if(health < psyche) {
+          // healt diseases
+          this.tint = healthTints[health];
+          this.ilness = healthDiseases[health];
+        } else {
+          // mental diseases
+          this.tint = mentalTints[psyche];
+          this.ilness = mentalDiseases[psyche];
+        }
+
+        var c = health + psyche;
+
+        contagious = 100 / (c > 0 ? (c == 1 ? c + 0.25 : c) : c + 1);
+
+        //console.log('choroba:', this.ilness, 'zakaźne:', contagious);
+      }
+
+    }
+
+    addAnimals() {
+          // enable cage & set timer
+          this.state.enabled = true;
+
+          // change texture
+          this.loadTexture('paw_klatki_pelne', 0, false);
+
+          // play sound
+          var sound = this.getRandomInt(0,1);
+          this.actions.add.sounds[sound].play();
+
+          // set attributes to max
+          this.attributes.health.current = this.attributes.health.max;
+          this.attributes.psyche.current = this.attributes.psyche.max;
+
+          // add cage to all full cages
+          Cage.full.push(this);
+
+          // add cage to pavilion full cages
+          this.pavilion.fullCages.push(this);
+
+          // update pavilion state
+          this.pavilion.updateState();
     }
 
     kill(cage) {
@@ -229,38 +322,6 @@ class Cage extends Prefab {
         }
     }
 
-    addAnimals() {
-          // enable cage & set timer
-          this.state.enabled = true;
-
-          // change texture
-          this.loadTexture('paw_klatki_pelne', 0, false);
-
-          // play sound
-          var sound = this.getRandomInt(0,1);
-          this.actions.add.sounds[sound].play();
-
-          // set attributes to max
-          this.attributes.condition.current = this.attributes.condition.max;
-          this.attributes.psyche.current = this.attributes.psyche.max;
-
-          // update actions
-          this.actions.add.visible = false;
-          this.actions.kill.visible = true;
-
-          // add cage to all full cages
-          Cage.full.push(this);
-
-          // add cage to pavilion full cages
-          this.pavilion.fullCages.push(this);
-
-          // update pavilion state
-          this.pavilion.updateState();
-
-          // create timer
-          this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, true, this.cageReady);
-    }
-
     emptyCage() {
         // destroy timer
         this.resetTimer();
@@ -272,12 +333,8 @@ class Cage extends Prefab {
         this.state.enabled = false;
 
         // set attributes to min
-        this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.health.current = this.attributes.health.min;
         this.attributes.psyche.current = this.attributes.psyche.min;
-
-        //update actions
-        this.actions.add.visible = true;
-        this.actions.kill.visible = false;
 
         // remove cage from all full cages
         if(Cage.full.indexOf(this) > -1) {
@@ -313,12 +370,8 @@ class Cage extends Prefab {
         this.state.enabled = false;
 
         // set attributes to min
-        this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.health.current = this.attributes.health.min;
         this.attributes.psyche.current = this.attributes.psyche.min;
-
-        //update actions
-        this.actions.repair.visible = true;
-        this.actions.kill.visible = false;
 
         // remove cage from all full cages
         if(Cage.full.indexOf(this) > -1) {
@@ -376,10 +429,6 @@ class Cage extends Prefab {
         if(this.pavilion.sickCages.indexOf(this) == -1) {
             this.pavilion.sickCages.push(this);
         }
-
-        //update actions
-        this.actions.heal.visible = true;
-        this.actions.kill.visible = false;
 
         // update state
         this.state.sick = true;
@@ -463,12 +512,8 @@ class Cage extends Prefab {
         this.state.enabled = false;
 
         // set attributes to min
-        this.attributes.condition.current = this.attributes.condition.min;
+        this.attributes.health.current = this.attributes.health.min;
         this.attributes.psyche.current = this.attributes.psyche.min;
-
-        //update actions
-        this.actions.add.visible = true;
-        this.actions.kill.visible = false;
 
         // remove cage from all full cages
         if(Cage.full.indexOf(this) > -1) {
@@ -484,12 +529,6 @@ class Cage extends Prefab {
         if(Cage.miserable.indexOf(this) > -1) {
             Cage.miserable.splice(Cage.miserable.indexOf(this), 1);
         }
-    }
-
-    cageReady() {
-        // cage ready to kill
-        this.actions.kill.enabled = true;
-        this.state.ready = true;
     }
 }
 

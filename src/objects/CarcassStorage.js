@@ -22,7 +22,9 @@ class CarcassStorage extends Prefab {
 				current: 0,
 				label: 'Tusze',
 				icon: 'kill_stock_icon',
-				increase: 2
+				increase: 2,
+			  level: 0,
+			  visible: true
 			}
 		};
 

@@ -22,7 +22,9 @@ class FurStorage extends Prefab {
             current: 0,
             label: 'Futro',
             icon: 'fur_icon',
-            increase: 2
+            increase: 2,
+            level: 0,
+            visible: true
         }
 	    };
 
