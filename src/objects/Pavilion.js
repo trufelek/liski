@@ -40,7 +40,7 @@ class Pavilion extends Prefab {
 
     updateState() {
       // update pavilion state
-      if(this.fullCages.length > 8) {
+      if(this.fullCages.length > 2) {
           this.state.crowded = true;
 
           if(Pavilion.crowded.indexOf(this) == -1) {

@@ -53,6 +53,10 @@ class Map {
     Farm.foodStorage = new FoodStorage(this.game, 910, 545, 'karma_back', 0, this.foodStorageGroup);
     Farm.foodStorage.anchor.set(0.5);
 
+    // add tools
+    var Shed = this.game.add.sprite(900, 500, 'szopa', 0, this.foodStorageGroup);
+    Shed.anchor.set(0.5);
+
     // draw foreground
     this.foreground = this.game.add.sprite(0, 0, 'foreground', 0, this.foregroundGroup);
     this.game.world.bringToTop(this.foregroundGroup);
