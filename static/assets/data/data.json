@@ -125,6 +125,8 @@
     "event": { "type": "sound", "path": "assets/sounds/event.mp3" },
     "repair": { "type": "sound", "path": "assets/sounds/repair.mp3" },
     "heal": { "type": "sound", "path": "assets/sounds/heal.mp3" },
-    "upgrade": { "type": "sound", "path": "assets/sounds/upgrade.mp3" }
+    "upgrade": { "type": "sound", "path": "assets/sounds/upgrade.mp3" },
+    "electric": { "type": "sound", "path": "assets/sounds/electric.mp3" },
+    "clean": { "type": "sound", "path": "assets/sounds/cleaning.mp3" }
   }
 }

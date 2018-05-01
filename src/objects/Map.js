@@ -11,7 +11,6 @@ import Slaughterhouse from 'objects/Slaughterhouse';
 import FurStorage from 'objects/FurStorage';
 import CarcassStorage from 'objects/CarcassStorage';
 import FoodStorage from 'objects/FoodStorage';
-import KillingStation from 'objects/KillingStation';
 import SkinningStation from 'objects/SkinningStation';
 import Tools from 'objects/Tools';
 
@@ -63,7 +62,7 @@ class Map {
     Farm.infirmary.anchor.set(0.5);
 
     // add electric tools
-    Farm.electricity = new Tools(this.game, 1320, 570, 'prad', 0, 'electricity', this.game.cursor.electric, this.slaughterhouseGroup);
+    Farm.electricity = new Tools(this.game, 1320, 570, 'prad', 0, 'killing', this.game.cursor.electric, this.slaughterhouseGroup);
     Farm.electricity.anchor.set(0.5);
 
     // draw foreground
