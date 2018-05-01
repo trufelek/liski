@@ -24,7 +24,8 @@ class FurStorage extends Prefab {
             icon: 'fur_icon',
             increase: 2,
             level: 0,
-            visible: true
+            visible: true,
+            position: 0
         }
 	    };
 

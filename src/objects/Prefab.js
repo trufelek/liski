@@ -16,7 +16,6 @@ class Prefab extends Phaser.Sprite {
 
     // enable input
     this.inputEnabled = true;
-    this.input.useHandCursor = true;
 
     // add click/touch event listeners
     this.events.onInputDown.add(this.click, this);
@@ -56,7 +55,7 @@ class Prefab extends Phaser.Sprite {
   }
 
   click() {
-    if(this.actions) {
+    if(this.actions && this.game.toolsMode == 'default') {
       // show actions on click
       Gui.showActions(this, this.position, this.actions);
     }

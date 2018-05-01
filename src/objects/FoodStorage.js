@@ -23,7 +23,8 @@ class FoodStorage extends Prefab {
                 label: 'Karma',
                 icon: 'food_icon',
                 level: 0,
-                visible: true
+                visible: true,
+                position: 0
             }
         };
 

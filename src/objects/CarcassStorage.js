@@ -24,7 +24,8 @@ class CarcassStorage extends Prefab {
 				icon: 'kill_stock_icon',
 				increase: 2,
 			  level: 0,
-			  visible: true
+			  visible: true,
+				position: 0
 			}
 		};
 

@@ -23,17 +23,6 @@ class Cage extends Prefab {
         this.randomCleannesFactor = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
 
         this.attributes = {
-            health: {
-                max: 100,
-                min: 0,
-                current: 0,
-                label: 'Stan fizyczny',
-                decrease: this.randomHealthFactor,
-                hungry_decrease: 3,
-                crowded_decrease: 1,
-                level: 0,
-                visible: true
-            },
             psyche: {
               max: 100,
               min: 0,
@@ -43,7 +32,22 @@ class Cage extends Prefab {
               hungry_decrease: 1,
               crowded_decrease: 3,
               level: 0,
-              visible: true
+              visible: false,
+              visibleMode: 'healing',
+              position: 0
+            },
+            health: {
+                max: 100,
+                min: 0,
+                current: 0,
+                label: 'Stan fizyczny',
+                decrease: this.randomHealthFactor,
+                hungry_decrease: 3,
+                crowded_decrease: 1,
+                level: 0,
+                visible: false,
+                visibleMode: 'healing',
+                position: 1
             },
             cleanness: {
               max: 100,
@@ -54,18 +58,22 @@ class Cage extends Prefab {
               hungry_increase: 0,
               crowded_increase: 1,
               level: 0,
-              visible: false
+              visible: false,
+              visibleMode: 'cleaning',
+              position: 0
             },
-            deaths: {
+            foxes: {
               max: 100,
               min: 0,
               current: 0,
               label: 'Liczba trucheł',
-              increase: this.randomDeathsFactor,
-              hungry_increase: 1,
-              crowded_increase: 1,
+              decrease: this.randomDeathsFactor,
+              hungry_decrease: 1,
+              crowded_decrease: 1,
               level: 0,
-              visible: false
+              visible: false,
+              visibleMode: 'electricity',
+              position: 0
             }
         };
 
@@ -158,10 +166,17 @@ class Cage extends Prefab {
 
         // create timer loop
         this.createTimerLoop(5000, this.updateCage, this);
+        this.createTimerLoop(60, this.updateAttrsVisibility, this);
     }
 
     inputOver() {
       super.inputOver();
+
+      if(this.state.enabled && this.game.toolsMode == 'default') {
+        this.game.canvas.style.cursor = this.game.cursor.hand;
+      } else {
+        this.game.canvas.style.cursor = this.game.currentCursor;
+      }
 
       this.tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
       this.tween.onComplete.add(function(){
@@ -172,15 +187,23 @@ class Cage extends Prefab {
     inputOut() {
       super.inputOut();
 
+      this.game.canvas.style.cursor = this.game.currentCursor;
+
       if(this.tween) this.tween.stop();
       this.pavilion.roof.visible = true;
       var tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
-
     }
 
     showStats(x, y) {
       // create stats
       this.statsBar = new Stats(this.game, x, y, this, false, true);
+    }
+
+    updateAttrsVisibility() {
+      for(var a in this.attributes) {
+        var attr = this.attributes[a];
+        attr.visible = this.game.toolsMode == attr.visibleMode;
+      }
     }
 
     updateCage() {
@@ -240,13 +263,6 @@ class Cage extends Prefab {
         }
     }
 
-    eatingFood() {
-        // decrease food lvl in food store
-        if(!Farm.foodStorage.state.empty) {
-            Farm.foodStorage.consumeFood(this.eatingAmount);
-        }
-    }
-
     updateCageCondition () {
       var healthDiseases = ['nosówka', 'choroby jamy ustnej', 'choroby oczu',];
       var mentalDiseases = ['nosówka', 'agresja/ autoagresja', 'apatia / zachowania stereotypowe'];
@@ -260,8 +276,6 @@ class Cage extends Prefab {
 
 
       if(health < 3 || psyche < 3) {
-        //console.log('zdrowie:', health, 'psychika:', psyche);
-
         if(health < psyche) {
           // healt diseases
           this.tint = healthTints[health];
@@ -275,10 +289,15 @@ class Cage extends Prefab {
         var c = health + psyche;
 
         contagious = 100 / (c > 0 ? (c == 1 ? c + 0.25 : c) : c + 1);
-
-        //console.log('choroba:', this.ilness, 'zakaźne:', contagious);
       }
 
+    }
+
+    eatingFood() {
+        // decrease food lvl in food store
+        if(!Farm.foodStorage.state.empty) {
+            Farm.foodStorage.consumeFood(this.eatingAmount);
+        }
     }
 
     addAnimals() {
@@ -293,6 +312,7 @@ class Cage extends Prefab {
           this.actions.add.sounds[sound].play();
 
           // set attributes to max
+          this.attributes.foxes.current = this.attributes.foxes.max;
           this.attributes.health.current = this.attributes.health.max;
           this.attributes.psyche.current = this.attributes.psyche.max;
 

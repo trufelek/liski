@@ -53,6 +53,7 @@
     "cursor_grab": { "type": "image", "path": "assets/img/gui/cursor_grab.png" },
     "cursor_med": { "type": "image", "path": "assets/img/gui/cursor_med.png" },
     "cursor_clean": { "type": "image", "path": "assets/img/gui/cursor_clean.png" },
+    "cursor_electric": { "type": "image", "path": "assets/img/gui/cursor_electric.png" },
 
     "action_kill_icon": { "type": "image", "path": "assets/img/icons/action_kill_icon.png" },
     "action_heal_icon": { "type": "image", "path": "assets/img/icons/action_heal_icon.png" },
@@ -78,6 +79,8 @@
     "szopa_glow": { "type": "image", "path": "assets/img/map/szopa_glow.png" },
     "szpital": { "type": "image", "path": "assets/img/map/szpital.png" },
     "szpital_glow": { "type": "image", "path": "assets/img/map/szpital_glow.png" },
+    "prad": { "type": "image", "path": "assets/img/map/prad.png" },
+    "prad_glow": { "type": "image", "path": "assets/img/map/prad_glow.png" },
 
     "inku_cien_a": { "type": "image", "path": "assets/img/map/incubator/inku_cien_a.png" },
     "inku_cien_b": { "type": "image", "path": "assets/img/map/incubator/inku_cien_b.png" },
