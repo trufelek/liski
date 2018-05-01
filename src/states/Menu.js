@@ -16,7 +16,6 @@ class Menu extends Phaser.State {
     this.start = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY + 100, 'start');
     this.start.anchor.setTo(0.5);
     this.start.inputEnabled = true;
-    this.start.input.useHandCursor = true;
 
     // start button interactions
     this.start.events.onInputOver.add(function() {

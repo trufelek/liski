@@ -13,6 +13,7 @@ import CarcassStorage from 'objects/CarcassStorage';
 import FoodStorage from 'objects/FoodStorage';
 import KillingStation from 'objects/KillingStation';
 import SkinningStation from 'objects/SkinningStation';
+import Tools from 'objects/Tools';
 
 class Map {
   constructor() {}
@@ -53,9 +54,17 @@ class Map {
     Farm.foodStorage = new FoodStorage(this.game, 910, 545, 'karma_back', 0, this.foodStorageGroup);
     Farm.foodStorage.anchor.set(0.5);
 
-    // add tools
-    var Shed = this.game.add.sprite(900, 500, 'szopa', 0, this.foodStorageGroup);
-    Shed.anchor.set(0.5);
+    // add shed tools
+    Farm.shed = new Tools(this.game, 800, 600, 'szopa', 0, 'cleaning', this.game.cursor.clean, this.foodStorageGroup);
+    Farm.shed.anchor.set(0.5);
+
+    // add infirmary tools
+    Farm.infirmary = new Tools(this.game, 1150, 530, 'szpital', 0, 'healing', this.game.cursor.heal, this.slaughterhouseGroup);
+    Farm.infirmary.anchor.set(0.5);
+
+    // add electric tools
+    Farm.electricity = new Tools(this.game, 1320, 570, 'prad', 0, 'electricity', this.game.cursor.electric, this.slaughterhouseGroup);
+    Farm.electricity.anchor.set(0.5);
 
     // draw foreground
     this.foreground = this.game.add.sprite(0, 0, 'foreground', 0, this.foregroundGroup);

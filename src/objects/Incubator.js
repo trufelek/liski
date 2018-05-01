@@ -91,7 +91,9 @@ class Incubator extends Prefab {
     this.drag.events.onDragStop.add(this.onDragStop, this);
 
     this.drag.events.onInputOver.add(function(){
-      this.game.canvas.style.cursor = "url('/assets/img/gui/cursor_grab.png'), auto";
+      if(this.game.toolsMode == 'default') {
+          this.game.canvas.style.cursor = this.game.cursor.hand;
+      }
       this.dragGlow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
       this.dragGlow.anchor.set(0.5, 0.5);
       this.dragGlow.alpha = 1;
@@ -117,25 +119,27 @@ class Incubator extends Prefab {
   inputOver() {
     super.inputOver();
 
-    if(this.incubated) {
-      this.game.canvas.style.cursor = "url('/assets/img/gui/cursor_grab.png'), auto";
+    if(this.incubated && this.game.toolsMode == 'default') {
+      this.game.canvas.style.cursor = this.game.cursor.hand;
     }
   }
 
   inputOut() {
     super.inputOut();
-    this.game.canvas.style.cursor = 'default';
+    this.game.canvas.style.cursor = this.game.currentCursor;
   }
 
   updateActions() {
       // update actions
       this.actions.incubate.visible = this.game.season == 'jesień';
       this.actions.separate.visible = this.game.season != 'wiosna';
+
+      if(this.drag) this.drag.inputEnabled = this.game.toolsMode == 'default';
   }
 
   onDragStart(sprite, pointer) {
     this.drag.alpha = 1;
-    this.game.canvas.style.cursor = "url('/assets/img/gui/cursor_grabbing.png'), auto";
+    this.game.canvas.style.cursor = this.game.cursor.grab;
 
     // show cages
     for(var p in Farm.pavilions) {
@@ -146,7 +150,7 @@ class Incubator extends Prefab {
 
   onDragStop(sprite) {
     var overlapped = [];
-    this.game.canvas.style.cursor = 'default';
+    this.game.canvas.style.cursor = this.game.currentCursor;
 
     if(this.dragGlow) {
       this.dragGlow.destroy();
@@ -178,6 +182,7 @@ class Incubator extends Prefab {
       var cage = overlappedSorted[overlappedSorted.length - 1];
 
       // change sprite position
+      this.drag = null;
       sprite.destroy();
 
       // move animals to cage

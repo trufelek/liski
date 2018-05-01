@@ -32,7 +32,7 @@ class Stats extends Phaser.Sprite {
         health: '0xccff65',
         psyche: '0xccccff',
         cleanness: '0xcdffff',
-        deaths: '0xfe6565',
+        foxes: '0xfe6565',
         food: '0xffcc66'
       };
 
@@ -51,16 +51,19 @@ class Stats extends Phaser.Sprite {
 	}
 
 	drawStatsBars() {
-     var offsetTop = 0;
 	    if(this.drawTimerBar) {
-	        this.timerBar = this.drawBar(offsetTop, 'timer');
+	        this.timerBar = this.drawBar(0, 'timer');
 	        this.timerBar.progress = this.timerBar.children[1];
 	    }
 
 	   if(this.drawAttrsBar) {
        for(var b in this.object.attributes) {
+          var offsetTop = 0;
+
+           if(this.object.attributes[b].position) {
+             offsetTop = this.height * this.object.attributes[b].position;
+           }
            this.attrsBars[b] = this.drawBar(offsetTop, b);
-           offsetTop += this.height;
        }
 	   }
 	}

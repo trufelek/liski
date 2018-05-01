@@ -40,6 +40,18 @@ class Game extends Phaser.Game {
 			}
 		};
 
+		// game's tools mode
+		this.toolsMode = 'default';
+		this.cursor = {
+			default: 'pointer',
+			hand: "url('/assets/img/gui/cursor_grab.png'), auto",
+			grab: "url('/assets/img/gui/cursor_grabbing.png'), auto",
+			clean: "url('/assets/img/gui/cursor_clean.png'), auto",
+			heal: "url('/assets/img/gui/cursor_med.png'), auto",
+			electric: "url('/assets/img/gui/cursor_electric.png'), auto"
+		};
+		this.currentCursor = this.cursor.default;
+
 		// game's tutorial
 		this.tutorialEnabled = false;
 

@@ -28,6 +28,17 @@ class Level extends Phaser.State {
     Simulator.music = this.game.add.audio('wiosna');
     Simulator.music.loopFull(0);
 
+    // reset game tools mode on esc click
+    this.game.input.keyboard.onUpCallback = function (e) {
+      if(e.keyCode == Phaser.Keyboard.ESC) {
+        if(this.game.toolsMode != 'default') {
+          this.game.toolsMode = 'default';
+          this.game.canvas.style.cursor = this.game.cursor.default;
+          this.game.currentCursor = this.game.cursor.default;
+        }
+      }
+    };
+
     this.showLevelIntro();
   }
 
