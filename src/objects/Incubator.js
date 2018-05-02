@@ -201,63 +201,63 @@ class Incubator extends Prefab {
   }
 
 	incubate(incubator, enableSound = true) {
-	    // disable incubate action
-	    incubator.actions.incubate.enabled = false;
+    // disable incubate action
+    incubator.actions.incubate.enabled = false;
 
-	    // play sound
-      if(enableSound) {
-        var sound = Math.round(Math.random());
-  	    incubator.actions.incubate.sounds[sound].play();
-      }
+    // play sound
+    if(enableSound) {
+      var sound = Math.round(Math.random());
+	    incubator.actions.incubate.sounds[sound].play();
+    }
 
-	    // decrease owner cash
-	    Owner.cash -= incubator.actions.incubate.cost;
-	    Gui.showCost(incubator.actions.incubate.cost, incubator.actions.incubate.income, incubator.position);
+    // decrease owner cash
+    Owner.cash -= incubator.actions.incubate.cost;
+    Gui.showCost(incubator.actions.incubate.cost, incubator.actions.incubate.income, incubator.position);
 
-	    //start timer
-	    incubator.timer.clock.start();
+    //start timer
+    incubator.timer.clock.start();
 	}
 
 	endIncubation() {
-      this.incubated = true;
+    this.incubated = true;
 
-	    Farm.incubated += this.increase;
-	    Incubator.incubated.push(this);
-      Incubator.ready ++;
+    Farm.incubated += this.increase;
+    Incubator.incubated.push(this);
+    Incubator.ready ++;
 
-      // enable drag & drop
-      this.enableDraggable();
+    // enable drag & drop
+    this.enableDraggable();
 
-      // change texture
-	    this.loadTexture('inku_full_' + this.type , 0, false);
+    // change texture
+    this.loadTexture('inku_full_' + this.type , 0, false);
 
-      if(Incubator.count == Incubator.ready) {
-        this.game.conditions[this.game.season].allIncubated = true;
-      }
+    if(Incubator.count == Incubator.ready) {
+      this.game.conditions[this.game.season].allIncubated = true;
+    }
 	}
 
 	dismissAnimals() {
-	    // shift incubator from incubated incubators array
-      if (Incubator.incubated.indexOf(this) > -1) {
-          Incubator.incubated.splice(Incubator.incubated.indexOf(this), 1);
-      }
+    // shift incubator from incubated incubators array
+    if (Incubator.incubated.indexOf(this) > -1) {
+        Incubator.incubated.splice(Incubator.incubated.indexOf(this), 1);
+    }
 
-      this.incubated = false;
+    this.incubated = false;
 
-      if(!Incubator.incubated.length) {
-        Incubator.ready = 0;
-        this.game.conditions[this.game.season].allInCages = true;
-      }
+    if(!Incubator.incubated.length) {
+      Incubator.ready = 0;
+      this.game.conditions[this.game.season].allInCages = true;
+    }
 
-	    // set action incubate to enabled
-	    this.actions.incubate.enabled = true;
-	    this.resetTimer();
+    // set action incubate to enabled
+    this.actions.incubate.enabled = true;
+    this.resetTimer();
 
-	    // create timer again
-	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
+    // create timer again
+    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endIncubation);
 
-	    // change texture
-	    this.loadTexture('inku_empty_' + this.type, 0, false);
+    // change texture
+    this.loadTexture('inku_empty_' + this.type, 0, false);
 	}
 }
 

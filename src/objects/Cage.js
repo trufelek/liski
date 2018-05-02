@@ -7,7 +7,6 @@ import Owner from 'objects/Owner';
 import Farm from 'objects/Farm';
 import Gui from 'objects/Gui';
 import Pavilion from 'objects/Pavilion';
-import KillingStation from 'objects/KillingStation';
 import Incubator from 'objects/Incubator';
 import Stats from 'objects/Stats';
 
@@ -113,15 +112,12 @@ class Cage extends Prefab {
         };
 
         this.illness = false;
-
         this.eatingAmount = 5;
-
+        this.dragGlow = null;
         this.tween = null;
-
         this.pavilion = pavilion;
         this.statsBar = null;
         this.warning = null;
-
         this.glowTexture = 'paw_' + type + '_glow';
 
         Cage.all[Cage.count] = this;
@@ -135,7 +131,7 @@ class Cage extends Prefab {
         this.game.add.existing(this);
 
         // set object's physics & input
-        game.physics.arcade.enable(this);
+        this.game.physics.arcade.enable(this);
         this.body.setSize(200, 100, 15, 15);
         this.input.priorityID = 9;
 
@@ -173,12 +169,14 @@ class Cage extends Prefab {
     }
 
     click() {
-      if(this.game.toolsMode == 'healing' && this.state.sick) {
-        this.heal();
-      } else if(this.game.toolsMode == 'killing' && this.state.enabled && this.state.ready) {
-        this.kill();
-      } else if(this.game.toolsMode == 'cleaning') {
-        this.clean();
+      if(this.state.enabled) {
+        if(this.game.toolsMode == 'healing' && this.state.sick) {
+          this.heal();
+        } else if(this.game.toolsMode == 'killing' && this.state.ready && !Farm.carcassStorage.state.full) {
+          this.kill();
+        } else if(this.game.toolsMode == 'cleaning' && this.attributes.cleanness.level > 0) {
+          this.clean();
+        }
       }
     }
 
@@ -261,7 +259,6 @@ class Cage extends Prefab {
       var contagious = 0;
       var health = this.attributes.health.level;
       var psyche = this.attributes.psyche.level;
-
 
       if(health < 3 || psyche < 3) {
         if(health < psyche) {
@@ -381,7 +378,7 @@ class Cage extends Prefab {
 
       // update cleanness attribute
       this.attributes.cleanness.level -= this.attributes.cleanness.level > 0 ? 1 : 0;
-      this.attributes.cleanness.current = this.attributes.cleanness.max / 3 * this.attributes.cleanness.level - (this.attributes.cleanness.level > 0 ? 1 : 0);
+      this.attributes.cleanness.current = this.attributes.cleanness.max / 3 * this.attributes.cleanness.level;
     }
 
     die() {
@@ -420,10 +417,94 @@ class Cage extends Prefab {
     }
 
     kill() {
+      // update state
+      this.state.sick = false;
+      this.state.enabled = false;
+
       // play sound
       this.actions.kill.sound.play();
 
-      this.die();
+      // hide warning
+      if(this.warning) {
+        Gui.hideWarning(this.warning);
+        this.warning = null;
+      }
+
+      // stack carcass & furs in storage
+      Farm.carcassStorage.stackCarcass();
+      Farm.killed += this.attributes.foxes.current;
+
+      // set attributes to min
+      this.attributes.foxes.current = this.attributes.foxes.min;
+      this.attributes.health.current = this.attributes.health.min;
+      this.attributes.psyche.current = this.attributes.psyche.min;
+      this.attributes.cleanness.current = this.attributes.cleanness.min;
+
+      // init draggable fox
+      this.initDraggable();
+    }
+
+    initDraggable() {
+      // add drag & drop image
+      this.drag = this.game.add.sprite(this.worldPosition.x, this.worldPosition.y, 'drag_dead', 0);
+      // this.drag.alpha = 0;
+      this.drag.inputEnabled = true;
+      this.drag.input.enableDrag();
+      this.game.world.bringToTop(this.drag);
+      game.physics.arcade.enable(this.drag);
+      this.drag.anchor.set(0.5);
+      this.drag.input.priorityID = 10;
+
+      // add drag & drop events
+      this.drag.events.onDragStart.add(this.onDragStart, this);
+      this.drag.events.onDragStop.add(this.onDragStop, this);
+
+      this.drag.events.onInputOver.add(function(){
+        if(this.game.toolsMode == 'default') {
+            this.game.canvas.style.cursor = this.game.cursor.hand;
+        }
+        this.dragGlow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
+        this.dragGlow.anchor.set(0.5, 0.5);
+        this.dragGlow.alpha = 1;
+      }, this);
+
+      this.drag.events.onInputOut.add(function(){
+        if(this.dragGlow) {
+          this.dragGlow.destroy();
+          this.dragGlow = null;
+        }
+      }, this);
+
+      this.drag.originalPosition = this.drag.position.clone();
+    }
+
+    onDragStart(sprite, pointer) {
+      // this.drag.alpha = 1;
+      this.game.canvas.style.cursor = this.game.cursor.grab;
+    }
+
+    onDragStop(sprite) {
+      this.game.canvas.style.cursor = this.game.currentCursor;
+
+      if(this.dragGlow) {
+        this.dragGlow.destroy();
+        this.dragGlow = null;
+      }
+
+      // check if overlapping with skinning station
+      if(game.physics.arcade.overlap(sprite, Farm.skinningStation) && !Farm.skinningStation.state.full) {
+        // change sprite position
+        this.drag = null;
+        sprite.destroy();
+
+        // add to skinning station
+        Farm.skinningStation.increaseStack();
+      } else {
+        // sprite is back to origin position
+        sprite.position.copyFrom(sprite.originalPosition);
+        // sprite.alpha = 0;
+        sprite.inputEnabled = true;
+      }
     }
 
     emptyCage() {

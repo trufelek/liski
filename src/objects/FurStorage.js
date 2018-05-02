@@ -130,6 +130,7 @@ class FurStorage extends Prefab {
 	sell(o) {
 	    // increase amount of sold fur
 	    o.stats.fur += o.attributes.fur.current;
+      Farm.selled += o.attributes.fur.current;
 
 	    // decrease owner cash
 	    var income = o.attributes.fur.current * o.actions.sell.price;

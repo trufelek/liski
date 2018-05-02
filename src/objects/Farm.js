@@ -8,9 +8,7 @@ class Farm {
       this.cages = [];
       this.incubators = [];
       this.pavilions = [];
-      this.skinningStations = [];
-      this.killingStations = [];
-      this.slaughterhouse = null;
+      this.skinningStation = [];
       this.foodStorage = null;
       this.furStorage = null;
       this.carcassStorage = null;
@@ -18,6 +16,7 @@ class Farm {
       this.incubated = 0;
       this.killed = 0;
       this.skinned = 0;
+      this.selled = 0;
     }
 }
 

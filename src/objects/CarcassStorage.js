@@ -22,7 +22,7 @@ class CarcassStorage extends Prefab {
 				current: 0,
 				label: 'Tusze',
 				icon: 'kill_stock_icon',
-				increase: 2,
+				increase: 25,
 			  level: 0,
 			  visible: true,
 				position: 0
@@ -120,7 +120,7 @@ class CarcassStorage extends Prefab {
 		if(this.attributes.carcass.current + this.attributes.carcass.increase >= this.attributes.carcass.max) {
 			this.attributes.carcass.current = this.attributes.carcass.max;
 			// change state to full
-			CarcassStorage.full = true;
+			this.state.full = true;
 
 			// show alert
 			if(!this.alert) {
@@ -155,7 +155,7 @@ class CarcassStorage extends Prefab {
 		o.actions.utilization.sound.play();
 
 		// change state to empty
-		CarcassStorage.full = false;
+		o.state.full = false;
 
 		// hide alert
 		if(o.alert) {
@@ -187,7 +187,7 @@ class CarcassStorage extends Prefab {
 		o.actions.recycle.sound.play();
 
 		// change state to empty
-		CarcassStorage.full = false;
+		o.state.full = false;
 
 		// hide alert
 		if(o.alert) {

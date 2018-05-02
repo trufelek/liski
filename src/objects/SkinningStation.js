@@ -12,8 +12,6 @@ class SkinningStation extends Prefab {
 
       this.game = game;
 
-	    this.id = SkinningStation.count;
-
 	    this.attributes = {
 	        stack: {
 	            max: 50,
@@ -21,8 +19,11 @@ class SkinningStation extends Prefab {
 	            current: 0,
 	            label: 'Ilość zwierząt',
 	            icon: 'kill_stock_icon',
-	            increase: 50,
-	            decrease: 2
+	            increase: 25,
+	            skinning: 2,
+              level: 0,
+              visible: true,
+              position: 1
 	        }
 	    };
 
@@ -43,18 +44,17 @@ class SkinningStation extends Prefab {
 	        skinned: 0
 	    };
 
+      this.sound = this.game.add.audio('skinning');
+
 	    this.init();
-
-	    this.sound = this.game.add.audio('skinning');
-
-	    SkinningStation.all[this.id] = this;
-	    SkinningStation.ready.push(this);
-	    SkinningStation.count ++;
     }
 
     init() {
 	    // add object to game
 	    this.game.add.existing(this);
+
+      // set object's physics & input
+      this.game.physics.arcade.enable(this);
 
 	    // create timer
 	    this.createTimerEvent(this.timer.duration.minutes, this.timer.duration.seconds, false, this.endSkinning);
@@ -64,22 +64,20 @@ class SkinningStation extends Prefab {
 
 	    // create stats
 	    this.statsBar = new Stats(this.game, this.position.x, this.position.y, this, true, true);
-	    this.statsBar.timerBar.alpha = 0;
-	    this.statsBar.attrsBar.alpha = 0;
 	}
 
 	updateSkinningStation() {
 	    this.skinning();
 	}
 
-	increaseSkinStack() {
+	increaseStack() {
 	    // increase stack lvl
+      console.log('skinning:',this.attributes.stack.current);
 	    if(this.attributes.stack.current + this.attributes.stack.increase <= this.attributes.stack.max) {
 	        this.attributes.stack.current += this.attributes.stack.increase;
 
 	        if(this.attributes.stack.current == this.attributes.stack.max) {
 	            this.state.full = true;
-	            SkinningStation.ready.shift();
 	        }
 	    }
 	}
@@ -92,21 +90,17 @@ class SkinningStation extends Prefab {
 
 	endSkinning() {
 	    // decrease stack
-	    this.attributes.stack.current -= this.attributes.stack.decrease;
+	    this.attributes.stack.current -= this.attributes.stack.skinning;
 
 	    // count killed animals
-	    this.stats.skinned += this.attributes.stack.decrease;
-	    Farm.skinned += this.attributes.stack.decrease;
+	    this.stats.skinned += this.attributes.stack.skinning;
+	    Farm.skinned += this.attributes.stack.skinning;
 
 	    // play sound
 	    this.sound.play();
 
 	    if(!this.attributes.stack.current) {
 	        this.state.full = false;
-
-	        if(SkinningStation.ready.indexOf(this) == -1) {
-	            SkinningStation.ready.unshift(this);
-	        }
 	    }
 
 	    // stack carcass & furs in storage
@@ -120,9 +114,5 @@ class SkinningStation extends Prefab {
 	}
 
 }
-
-SkinningStation.all = {};
-SkinningStation.count = 0;
-SkinningStation.ready = [];
 
 export default SkinningStation;
