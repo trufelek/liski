@@ -14,12 +14,12 @@ class SkinningStation extends Prefab {
 
 	    this.attributes = {
 	        stack: {
-	            max: 50,
+	            max: 100,
 	            min: 0,
 	            current: 0,
 	            label: 'Ilość zwierząt',
 	            icon: 'kill_stock_icon',
-	            increase: 25,
+	            decrease: 25,
 	            skinning: 2,
               level: 0,
               visible: true,
@@ -72,14 +72,12 @@ class SkinningStation extends Prefab {
 
 	increaseStack() {
 	    // increase stack lvl
-      console.log('skinning:',this.attributes.stack.current);
-	    if(this.attributes.stack.current + this.attributes.stack.increase <= this.attributes.stack.max) {
-	        this.attributes.stack.current += this.attributes.stack.increase;
-
-	        if(this.attributes.stack.current == this.attributes.stack.max) {
-	            this.state.full = true;
-	        }
-	    }
+      if(this.attributes.stack.current + this.attributes.stack.decrease > this.attributes.stack.max) {
+          this.state.full = true;
+          this.attributes.stack.current = this.attributes.stack.max;
+      } else {
+         this.attributes.stack.current += this.attributes.stack.decrease;
+      }
 	}
 
 	skinning() {
@@ -99,7 +97,7 @@ class SkinningStation extends Prefab {
 	    // play sound
 	    this.sound.play();
 
-	    if(!this.attributes.stack.current) {
+	    if(this.attributes.stack.current + this.attributes.stack.decrease <= this.attributes.stack.max) {
 	        this.state.full = false;
 	    }
 

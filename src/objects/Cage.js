@@ -283,6 +283,7 @@ class Cage extends Prefab {
 
         if(health == 0 && psyche == 0) {
           this.die();
+          this.emptyCage();
         }
       }
     }
@@ -381,15 +382,28 @@ class Cage extends Prefab {
       this.attributes.cleanness.current = this.attributes.cleanness.max / 3 * this.attributes.cleanness.level;
     }
 
+    emptyCage() {
+        // change texture
+        this.loadTexture('paw_klatki_puste', 0, false);
+
+        // remove cage from all full cages
+        Cage.full.splice(Cage.full.indexOf(this), 1);
+
+        // remove from all sick cages
+        if(Cage.sick.indexOf(this) > -1) {
+            Cage.sick.splice(Cage.sick.indexOf(this), 1);
+        }
+
+        // update pavilion state
+        this.pavilion.updateState();
+    }
+
     die() {
       // update state
       this.state.sick = false;
       this.state.enabled = false;
 
-      // change texture
-      this.loadTexture('paw_klatki_puste', 0, false);
-
-      // play kill sound
+      // play dying sound
       this.actions.kill.sounds[0].play();
 
       // hide warning
@@ -398,47 +412,23 @@ class Cage extends Prefab {
         this.warning = null;
       }
 
-      // remove cage from all full cages
-      Cage.full.splice(Cage.full.indexOf(this), 1);
-
-      // remove from all sick cages
-      if(Cage.sick.indexOf(this) > -1) {
-          Cage.sick.splice(Cage.sick.indexOf(this), 1);
-      }
-
       // set attributes to min
       this.attributes.foxes.current = this.attributes.foxes.min;
       this.attributes.health.current = this.attributes.health.min;
       this.attributes.psyche.current = this.attributes.psyche.min;
       this.attributes.cleanness.current = this.attributes.cleanness.min;
-
-      // update pavilion state
-      this.pavilion.updateState();
     }
 
     kill() {
-      // update state
-      this.state.sick = false;
-      this.state.enabled = false;
+      // kill animals
+      this.die();
 
-      // play sound
+      // play electric sound
       this.actions.kill.sound.play();
-
-      // hide warning
-      if(this.warning) {
-        Gui.hideWarning(this.warning);
-        this.warning = null;
-      }
 
       // stack carcass & furs in storage
       Farm.carcassStorage.stackCarcass();
       Farm.killed += this.attributes.foxes.current;
-
-      // set attributes to min
-      this.attributes.foxes.current = this.attributes.foxes.min;
-      this.attributes.health.current = this.attributes.health.min;
-      this.attributes.psyche.current = this.attributes.psyche.min;
-      this.attributes.cleanness.current = this.attributes.cleanness.min;
 
       // init draggable fox
       this.initDraggable();
@@ -447,7 +437,7 @@ class Cage extends Prefab {
     initDraggable() {
       // add drag & drop image
       this.drag = this.game.add.sprite(this.worldPosition.x, this.worldPosition.y, 'drag_dead', 0);
-      // this.drag.alpha = 0;
+      this.drag.alpha = 0;
       this.drag.inputEnabled = true;
       this.drag.input.enableDrag();
       this.game.world.bringToTop(this.drag);
@@ -466,6 +456,11 @@ class Cage extends Prefab {
         this.dragGlow = this.addChild(this.game.add.sprite(0, 0, this.glowTexture, 0));
         this.dragGlow.anchor.set(0.5, 0.5);
         this.dragGlow.alpha = 1;
+
+        this.tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 0 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
+        this.tween.onComplete.add(function(){
+          this.pavilion.roof.visible = false;
+        }, this);
       }, this);
 
       this.drag.events.onInputOut.add(function(){
@@ -473,13 +468,16 @@ class Cage extends Prefab {
           this.dragGlow.destroy();
           this.dragGlow = null;
         }
+
+        this.pavilion.roof.visible = true;
+        var tween = this.game.add.tween(this.pavilion.roof).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
       }, this);
 
       this.drag.originalPosition = this.drag.position.clone();
     }
 
     onDragStart(sprite, pointer) {
-      // this.drag.alpha = 1;
+      this.drag.alpha = 1;
       this.game.canvas.style.cursor = this.game.cursor.grab;
     }
 
@@ -499,17 +497,15 @@ class Cage extends Prefab {
 
         // add to skinning station
         Farm.skinningStation.increaseStack();
+
+        // empty cage
+        this.emptyCage();
       } else {
         // sprite is back to origin position
         sprite.position.copyFrom(sprite.originalPosition);
-        // sprite.alpha = 0;
+        sprite.alpha = 0;
         sprite.inputEnabled = true;
       }
-    }
-
-    emptyCage() {
-        // change texture
-        this.loadTexture('paw_klatki_puste', 0, false);
     }
 
     escapeFromCage() {

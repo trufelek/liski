@@ -130,7 +130,7 @@ class FoodStorage extends Prefab {
         }
 
         if(o.game.season == 'wiosna' && game.year == 1) {
-          o.game.conditions[o.game.season].foodStorageFull = true;
+          o.game.seasonConditions[o.game.season].foodStorageFull = true;
         }
 
         // play sound

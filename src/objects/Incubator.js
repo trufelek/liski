@@ -131,9 +131,6 @@ class Incubator extends Prefab {
 
   updateActions() {
       // update actions
-      this.actions.incubate.visible = this.game.season == 'jesień';
-      this.actions.separate.visible = this.game.season != 'wiosna';
-
       if(this.drag) this.drag.inputEnabled = this.game.toolsMode == 'default';
   }
 
@@ -232,7 +229,7 @@ class Incubator extends Prefab {
     this.loadTexture('inku_full_' + this.type , 0, false);
 
     if(Incubator.count == Incubator.ready) {
-      this.game.conditions[this.game.season].allIncubated = true;
+      this.game.seasonConditions[this.game.season].allIncubated = true;
     }
 	}
 
@@ -246,7 +243,7 @@ class Incubator extends Prefab {
 
     if(!Incubator.incubated.length) {
       Incubator.ready = 0;
-      this.game.conditions[this.game.season].allInCages = true;
+      this.game.seasonConditions[this.game.season].allInCages = true;
     }
 
     // set action incubate to enabled

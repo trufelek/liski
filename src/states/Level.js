@@ -13,7 +13,7 @@ import Tutorial from 'objects/Tutorial';
 class Level extends Phaser.State {
   create() {
     console.log('Starting game...');
-    this.conditions = this.game.conditions[this.game.season];
+    this.conditions = this.game.seasonConditions[this.game.season];
 
     // init game objects
     Owner.init();
@@ -106,16 +106,30 @@ class Level extends Phaser.State {
     // switch game seasons
     var currentSeason = this.game.seasons.indexOf(this.game.season);
     var newSeason = currentSeason == 3 ? this.game.seasons[0] : this.game.seasons[currentSeason + 1];
+    var seasonDuration = 	this.game.seasonDuration[newSeason];
+    var seasonConditions = this.game.seasonConditions[newSeason]
     this.game.season = newSeason;
 
-    this.conditions = this.game.conditions[this.game.season];
+    // set year
+    if(currentSeason == 3) {
+      this.game.year ++;
+    }
+
+    // reset conditions
+    for(var c in seasonConditions) {
+      seasonConditions[c] = false;
+    }
+
+    this.conditions = seasonConditions;
+
+    // season's timer
+    if(!seasonConditions.timesUp) {
+      this.game.time.events.add(Phaser.Timer.MINUTE * seasonDuration.minutes + Phaser.Timer.SECOND * seasonDuration.seconds, this.switchSeasons, this);
+    }
 
     Simulator.music.stop();
     Simulator.music = this.game.add.audio(this.game.season.replace('ń', 'n'));
     Simulator.music.loopFull(0);
-
-    // TODO: add textures for each season
-    //Map.switchTextures(this.game.season);
 
     this.showLevelIntro();
   }
