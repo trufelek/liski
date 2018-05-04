@@ -28,12 +28,6 @@
     "restart": { "type": "image", "path": "assets/img/restart.png" },
     "restart_hover": { "type": "image", "path": "assets/img/restart_hover.png" },
 
-    "killing_robot": { "type": "image", "path": "assets/img/killing_robot.png" },
-    "skinning_robot": { "type": "image", "path": "assets/img/skinning_robot.png" },
-    "carcass": { "type": "image", "path": "assets/img/carcass.png" },
-    "furs": { "type": "image", "path": "assets/img/furs.png" },
-    "drag": { "type": "image", "path": "assets/img/drag.png" },
-
     "tooltip_line": { "type": "image", "path": "assets/img/gui/line.png" },
     "action_line": { "type": "image", "path": "assets/img/gui/line2.png" },
     "bar": { "type": "image", "path": "assets/img/gui/bar.png" },
@@ -54,6 +48,8 @@
     "cursor_med": { "type": "image", "path": "assets/img/gui/cursor_med.png" },
     "cursor_clean": { "type": "image", "path": "assets/img/gui/cursor_clean.png" },
     "cursor_electric": { "type": "image", "path": "assets/img/gui/cursor_electric.png" },
+    "drag": { "type": "image", "path": "assets/img/gui/drag.png" },
+    "drag_dead": { "type": "image", "path": "assets/img/gui/drag_dead.png" },
 
     "action_kill_icon": { "type": "image", "path": "assets/img/icons/action_kill_icon.png" },
     "action_heal_icon": { "type": "image", "path": "assets/img/icons/action_heal_icon.png" },
@@ -75,12 +71,14 @@
 
     "background": { "type": "image", "path": "assets/img/map/background.jpg" },
     "foreground": { "type": "image", "path": "assets/img/map/foreground.png" },
-    "szopa": { "type": "image", "path": "assets/img/map/szopa.png" },
-    "szopa_glow": { "type": "image", "path": "assets/img/map/szopa_glow.png" },
+    "carcass": { "type": "image", "path": "assets/img/map/carcass.png" },
+    "furs": { "type": "image", "path": "assets/img/map/furs.png" },
+
     "szpital": { "type": "image", "path": "assets/img/map/szpital.png" },
     "szpital_glow": { "type": "image", "path": "assets/img/map/szpital_glow.png" },
     "prad": { "type": "image", "path": "assets/img/map/prad.png" },
     "prad_glow": { "type": "image", "path": "assets/img/map/prad_glow.png" },
+    "skinning": { "type": "image", "path": "assets/img/map/skinning.png" },
 
     "inku_cien_a": { "type": "image", "path": "assets/img/map/incubator/inku_cien_a.png" },
     "inku_cien_b": { "type": "image", "path": "assets/img/map/incubator/inku_cien_b.png" },
@@ -92,6 +90,8 @@
     "inku_glow_b": { "type": "image", "path": "assets/img/map/incubator/inku_glow_b.png" },
 
     "karma_back": { "type": "image", "path": "assets/img/map/foodstorage/karma_back.png" },
+    "szopa": { "type": "image", "path": "assets/img/map/szopa.png" },
+    "szopa_glow": { "type": "image", "path": "assets/img/map/szopa_glow.png" },
 
     "paw_cien": { "type": "image", "path": "assets/img/map/pavilion/paw_cien.png" },
     "paw_dach": { "type": "image", "path": "assets/img/map/pavilion/paw_dach.png" },
@@ -125,6 +125,8 @@
     "event": { "type": "sound", "path": "assets/sounds/event.mp3" },
     "repair": { "type": "sound", "path": "assets/sounds/repair.mp3" },
     "heal": { "type": "sound", "path": "assets/sounds/heal.mp3" },
-    "upgrade": { "type": "sound", "path": "assets/sounds/upgrade.mp3" }
+    "upgrade": { "type": "sound", "path": "assets/sounds/upgrade.mp3" },
+    "electric": { "type": "sound", "path": "assets/sounds/electric.mp3" },
+    "clean": { "type": "sound", "path": "assets/sounds/cleaning.mp3" }
   }
 }

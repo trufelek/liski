@@ -248,7 +248,7 @@ class Gui {
   }
 
   showWarning(position, image) {
-    var warning = this.game.add.sprite(position.x, position.y - 25, image, 0);
+    var warning = this.game.add.sprite(position.x, position.y + 5, image, 0);
     warning.anchor.setTo(0.5);
     this.game.add.tween(warning.scale).to( { x: 1.5, y: 1.5 }, 1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
 

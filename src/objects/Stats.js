@@ -33,7 +33,10 @@ class Stats extends Phaser.Sprite {
         psyche: '0xccccff',
         cleanness: '0xcdffff',
         foxes: '0xfe6565',
-        food: '0xffcc66'
+        food: '0x00f9ff',
+        carcass: '0x00f9ff',
+        fur: '0x00f9ff',
+        stack: '0x00f9ff'
       };
 
 	    this.init();
@@ -99,31 +102,27 @@ class Stats extends Phaser.Sprite {
           this.attrsBars[a].alpha = attr.visible ? 1 : 0;
 
 	        // update bar progress
-	        this.attrsBars[a].progress.width = this.calculateBarWidth(lvl);
-          attr.level = this.calculateAttributeLevel(lvl);
+	        this.attrsBars[a].progress.width = attr.hasOwnProperty('decrease') ? this.calculateBarWidth(lvl) : this.calculateIncBarWidth(lvl);
+          attr.level = attr.hasOwnProperty('decrease') ? this.calculateAttributeLevel(lvl) : this.calculateIncAttributeLevel(lvl);
         }
 	    }
 	}
 
-	calculateBarWidth(percentage) {
-	    // calculates tint of a progress bar
+  calculateBarWidth(percentage) {
       var width = 0;
 
-	    if(percentage >= 66.6) {
+      if(percentage >= 66.6) {
         width = this.width * 100 / 100;
       } else if(percentage >= 33.3) {
         width = this.width * 66.6 / 100;
       } else if(percentage > 0) {
         width = this.width * 33.3 / 100;
-      } else {
-        width = 0;
       }
 
       return width;
-	}
+  }
 
   calculateAttributeLevel(percentage) {
-	    // calculates tint of a progress bar
       var level = 0;
 
 	    if(percentage >= 66.6) {
@@ -132,8 +131,34 @@ class Stats extends Phaser.Sprite {
         level = 2;
       } else if(percentage > 0) {
         level = 1;
-      } else {
-        level = 0;
+      }
+
+      return level;
+	}
+
+  calculateIncBarWidth(percentage) {
+      var width = 0;
+
+      if(percentage == 100) {
+        width = this.width * 100 / 100;
+      } else if(percentage >= 66.6) {
+        width = this.width * 66.6 / 100;
+      } else if(percentage >= 33.3) {
+        width = this.width * 33.3 / 100;
+      }
+
+      return width;
+  }
+
+  calculateIncAttributeLevel(percentage) {
+      var level = 0;
+
+	    if(percentage == 100) {
+        level = 3;
+      } else if(percentage >= 66.6) {
+        level = 2;
+      } else if(percentage >= 33.3) {
+        level = 1;
       }
 
       return level;

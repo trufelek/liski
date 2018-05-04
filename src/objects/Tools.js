@@ -20,7 +20,7 @@ class Tools extends Prefab {
     // add object to game
     this.game.add.existing(this);
 
-    if(this.tools == 'electricity') {
+    if(this.tools == 'killing') {
       this.width = 100;
       this.height = 100;
     }

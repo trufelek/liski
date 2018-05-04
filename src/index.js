@@ -14,29 +14,48 @@ class Game extends Phaser.Game {
 		this.state.add('Menu', Menu, false);
 		this.state.add('Level', Level, false);
 
+		// game level
+		this.year = 1;
+
 		// game's seasons
 		this.seasons = ['wiosna', 'lato', 'jesień', 'zima'];
 		this.season = this.seasons[0];
 
-		// game level
-		this.year = 1;
-
 		// game level condition
-		this.conditions = {
+		this.seasonConditions = {
 			'wiosna' : {
 				allIncubated: false,
 				allInCages: false,
-				foodStorageFull: false
+				foodStorageFull: false,
+				timesUp: true
 			},
 			'lato' : {
-				allCleaned: false
+				timesUp: false
 			},
 			'jesień' : {
-				allIncubated: false
+				timesUp: false
 			},
 			'zima' : {
-				allKilled: false,
-				allFurSold: false
+				timesUp: false
+			}
+		};
+
+		this.seasonDuration = {
+			'wiosna' : {
+				minutes: 1,
+				seconds: 30
+			},
+			'lato' : {
+				minutes: 1,
+				seconds: 30
+			},
+			'jesień' : {
+				minutes: 1,
+				seconds: 30
+			},
+			'zima' : {
+				minutes: 1,
+				seconds: 30
 			}
 		};
 

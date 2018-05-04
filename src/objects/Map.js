@@ -7,11 +7,9 @@ import Farm from 'objects/Farm';
 import Cage from 'objects/Cage';
 import Incubator from 'objects/Incubator';
 import Pavilion from 'objects/Pavilion';
-import Slaughterhouse from 'objects/Slaughterhouse';
+import FoodStorage from 'objects/FoodStorage';
 import FurStorage from 'objects/FurStorage';
 import CarcassStorage from 'objects/CarcassStorage';
-import FoodStorage from 'objects/FoodStorage';
-import KillingStation from 'objects/KillingStation';
 import SkinningStation from 'objects/SkinningStation';
 import Tools from 'objects/Tools';
 
@@ -50,9 +48,17 @@ class Map {
     // add incubators
     this.drawIncubators();
 
-    // add food FurStorage
+    // add food storage
     Farm.foodStorage = new FoodStorage(this.game, 910, 545, 'karma_back', 0, this.foodStorageGroup);
     Farm.foodStorage.anchor.set(0.5);
+
+    // add carcass storage
+    Farm.carcassStorage = new CarcassStorage(this.game, 1450, 800, 'carcass', 0, this.carcassStorageGroup);
+    Farm.carcassStorage.anchor.set(0.5);
+
+    // add fur storage
+    Farm.furStorage = new FurStorage(this.game, 1700, 800, 'furs', 0, this.furStorageGroup);
+    Farm.furStorage.anchor.set(0.5);
 
     // add shed tools
     Farm.shed = new Tools(this.game, 800, 600, 'szopa', 0, 'cleaning', this.game.cursor.clean, this.foodStorageGroup);
@@ -63,8 +69,12 @@ class Map {
     Farm.infirmary.anchor.set(0.5);
 
     // add electric tools
-    Farm.electricity = new Tools(this.game, 1320, 570, 'prad', 0, 'electricity', this.game.cursor.electric, this.slaughterhouseGroup);
+    Farm.electricity = new Tools(this.game, 1320, 570, 'prad', 0, 'killing', this.game.cursor.electric, this.slaughterhouseGroup);
     Farm.electricity.anchor.set(0.5);
+
+    // add skinning station
+    Farm.skinningStation = new SkinningStation(this.game, 1170, 662.5, 'skinning', 0, this.slaughterhouseGroup);
+    Farm.skinningStation.anchor.set(0.5);
 
     // draw foreground
     this.foreground = this.game.add.sprite(0, 0, 'foreground', 0, this.foregroundGroup);
